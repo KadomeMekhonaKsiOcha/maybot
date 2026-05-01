@@ -1,0 +1,738 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>3D Coin Flip Animation</title>
+    <link href="icon@family=Material+Icons.css" rel="stylesheet">
+    <style>
+    @font-face {
+        font-family: 'Intro';
+        src: url('intro.otf') format('opentype');
+    }
+    body, html {
+        margin: 0;
+        overflow: hidden;
+        width: 100%;
+        height: 100%;
+        background-image: url('coinflip-bg.png');
+        background-size: cover;
+        background-position: center;
+    }
+    .hidden {
+        display: none;
+    }
+    #container3D {
+        width: 100%;
+        height: 80%;
+    }
+    #flipButton {
+        font-weight: bold;
+        font-size: 35px;
+        padding: 31px 50px;
+        width: 350px;
+        border-radius: 31px;
+        /* Золотистый градиент */
+        background: linear-gradient(145deg, #ffd700 0%, #ffa500 100%);
+        color: #4a2982; /* Темно-фиолетовый текст */
+        cursor: pointer;
+        transition: all 0.3s ease;
+        outline: none;
+        font-family: 'Intro', sans-serif;
+        display: block;
+        position: absolute;
+        left: 50%;
+        top: 65%;
+        transform: translateX(-50%);
+        border: 4px solid #ffd700;
+        /* 3D эффект */
+        box-shadow:
+            0 10px 31px rgba(255, 215, 0, 0.3),
+            0 -4px 15px rgba(255, 215, 0, 0.2) inset,
+            0 8px 0 #b8860b;
+        text-shadow: 0 3px 5px rgba(0, 0, 0, 0.1);
+    }
+    #flipButton:hover {
+        transform: translateX(-50%) translateY(-4px);
+        background: linear-gradient(145deg, #ffd700 0%, #ffb700 100%);
+        box-shadow:
+            0 15px 38px rgba(255, 215, 0, 0.4),
+            0 -4px 15px rgba(255, 215, 0, 0.2) inset,
+            0 10px 0 #b8860b;
+    }
+    #flipButton:active {
+        transform: translateX(-50%) translateY(4px);
+        box-shadow:
+            0 5px 19px rgba(255, 215, 0, 0.3),
+            0 -4px 15px rgba(255, 215, 0, 0.2) inset,
+            0 4px 0 #b8860b;
+    }
+    #resultText {
+        animation: fadeInScaleUp 0.5s ease-out forwards;
+        position: absolute;
+        top: 20%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 82px;
+        color: white;
+        display: none;
+        font-family: 'Intro';
+        text-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+        z-index: 1000;
+    }
+    @keyframes fadeInScaleUp {
+        0% {
+            opacity: 0;
+            transform: translate(-50%, -50%) scale(0.8);
+        }
+        100% {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
+        }
+    }
+    .marquee {
+            margin-right: 30px;
+            width: 100%;
+            overflow: hidden;
+            background: #1d2671;
+            line-height: 20px;
+            white-space: nowrap;
+            position: absolute;
+            z-index: 10;
+            font-family: 'Intro', sans-serif;
+        }
+    .marquee p {
+        display: inline-block;
+        padding-left: 100%;
+        animation: marquee 20s linear infinite;
+    }
+    .marquee span {
+        opacity: 0;
+        animation: bounceIn 0.5s infinite alternate;
+        display: inline-block;
+        font-size: 2.34vw;
+        color: white;
+        text-shadow: 0px 2px 4px rgba(0, 0, 0, 0.5);
+        animation-delay: calc(var(--n) * 0.1s);
+    }
+    .marquee .text-segment {
+        margin-right: 60px;
+        display: inline-block;
+        font-size: 2.34vw;
+        color: white;
+        text-shadow: 0px 2px 4px rgba(0, 0, 0, 0.5);
+        opacity: 1;
+    }
+    @keyframes bounceIn {
+        0%, 100% { transform: translateY(0); opacity: 1; }
+        50% { transform: translateY(-13px); opacity: 0.5; }
+    }
+    @keyframes marquee {
+        0% { transform: translateX(0); }
+        100% { transform: translateX(-100%); }
+    }
+    #nsgocio-container {
+        display: flex;
+        align-items: center;
+        font-family: 'Intro', sans-serif;
+    }
+    #tg-icon {
+        width: 47px;
+        height: 47px;
+        position: absolute;
+        left: 13%;
+    }
+    #nsgocio-text {
+        position: absolute;
+        left: 27%;
+        font-size: 41px;
+        color: white;
+        margin-left: 1px;
+        text-shadow: 0 0 10px #black, 0 0 20px #black, 0 0 30px #black, 0 0 40px #black;
+    }
+    #notification {
+        width: 50%;
+        height: 35px;
+        padding: 7.8px;
+        border-radius: 19px;
+        display: none;
+        position: fixed;
+        top: 10%;
+        left: 50%;
+        transform: translateX(-50%);
+        background: linear-gradient(145deg, #6a3093, #a044ff);
+        color: white;
+        box-shadow: 0 2.5px 5px rgba(0, 0, 0, 0.4);
+        border: 1px solid #a044ff;
+        transition: top 1s ease-in-out, opacity 1s ease-in-out;
+        text-align: left;
+        z-index: 2000;
+        opacity: 0;
+    }
+    #notification.show {
+        top: 10%;
+        opacity: 1;
+    }
+    #notification-icon {
+        float: left;
+        width: 43px;
+        height: 43px;
+        margin-left: 6px;
+        margin-top: -7px;
+    }
+    #notification-content {
+        margin-left: 62px;
+        margin-top: 10px;
+    }
+    #notification-content h4 {
+        margin: 0;
+        padding: 0;
+        font-size: 13px;
+        font-family: 'Intro', sans-serif;
+        font-weight: bold;
+        margin-top: -8px;
+    }
+    #notification-content p {
+        margin: 3px 0 0;
+        font-size: 8px;
+        font-style: italic;
+        font-family: 'Intro', sans-serif;
+        margin-top: 3px;
+    }
+   #returnButton {
+        display: none;
+    }
+    @import url('css2@family=Unbounded%253Awght@300%3B400%3B700&display=swap.css');
+
+    .game-info {
+        position: absolute;
+        top: 40%;
+        transform: translateY(-50%);
+        font-family: 'Unbounded', sans-serif;
+        z-index: 1000;
+    }
+
+    #round-counter {
+        left: 15%;
+    }
+
+    #multiplier {
+        right: 8%;
+    }
+
+    /* Специальный стиль для последнего множителя */
+    #multiplier .number.last-multiplier {
+        margin-right: -35px;  /* Дополнительный сдвиг вправо для длинного числа */
+    }
+
+    .number {
+        font-size: 72px;
+        color: white;
+        font-weight: 700;
+        margin-bottom: 5px;
+        font-family: 'Unbounded', sans-serif;
+        text-align: center;
+    }
+
+    .label {
+        font-size: 24px;
+        color: white;
+        text-align: center;
+        font-family: 'Unbounded', sans-serif;
+        font-weight: 700;
+    }
+
+    #round-number {
+        text-align: center;
+    }
+
+    #multiplier .number {
+        font-size: 72px;
+        color: white !important;  /* Принудительно устанавливаем белый цвет */
+        font-weight: 700;
+        margin-bottom: 5px;
+        font-family: 'Unbounded', sans-serif;
+        text-align: center;
+        background: none;  /* Убираем фоновый градиент */
+        -webkit-background-clip: unset;  /* Отключаем clip */
+        -webkit-text-fill-color: white;  /* Явно задаем белый цвет текста */
+    }
+
+    /* Добавляем новые стили */
+    .circles-container {
+        position: absolute;
+        top: 11%;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        gap: 30px;
+        z-index: 1000;
+    }
+
+    .circle {
+        width: 80px;
+        height: 80px;
+        border: 4px dashed white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: 'Unbounded', sans-serif;
+        color: white;
+        font-size: 40px;
+        font-weight: 700;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .circle img {
+        position: absolute;
+        top: -60px;  /* Увеличили отступ для центрирования */
+        left: -60px;  /* Увеличили отступ для центрирования */
+        width: 200px;  /* Увеличили размер изображения */
+        height: 200px;  /* Увеличили размер изображения */
+        object-fit: cover;
+        border-radius: 50%;
+        display: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .circle.filled {
+        border: none;
+        padding: 0;
+    }
+
+    .circle.filled .question-mark {
+        display: none;
+    }
+
+    .circle.filled img {
+        display: block;
+    }
+
+    /* Стили для кнопки заново (такие же как у flipButton) */
+    #resetButton {
+        font-weight: bold;
+        font-size: 35px;
+        padding: 31px 50px;
+        width: 350px;
+        border-radius: 31px;
+        background: linear-gradient(145deg, #ffd700 0%, #ffa500 100%);
+        color: #4a2982;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        outline: none;
+        font-family: 'Intro', sans-serif;
+        display: none;
+        position: absolute;
+        left: 50%;
+        top: 80%;  /* Располагаем ниже кнопки "БРОСИТЬ" */
+        transform: translateX(-50%);
+        border: 4px solid #ffd700;
+        box-shadow: 0 10px 31px rgba(255, 215, 0, 0.3), 0 -4px 15px rgba(255, 215, 0, 0.2) inset, 0 8px 0 #b8860b;
+        text-shadow: 0 3px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    #resetButton:hover {
+        transform: translateX(-50%) translateY(-4px);
+        background: linear-gradient(145deg, #ffd700 0%, #ffb700 100%);
+        box-shadow: 0 15px 38px rgba(255, 215, 0, 0.4), 0 -4px 15px rgba(255, 215, 0, 0.2) inset, 0 10px 0 #b8860b;
+    }
+
+    #resetButton:active {
+        transform: translateX(-50%) translateY(4px);
+        box-shadow: 0 5px 19px rgba(255, 215, 0, 0.3), 0 -4px 15px rgba(255, 215, 0, 0.2) inset, 0 4px 0 #b8860b;
+    }
+    /* Стили для стрелки возврата */
+    .back-arrow {
+        position: fixed;
+        top: 85px;
+        left: 20px;
+        z-index: 1000;
+        color: white;
+        cursor: pointer;
+        font-size: 64px;  /* Увеличили в 2 раза */
+        display: flex;
+        align-items: center;
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    .back-arrow .material-icons {
+        font-size: 64px;  /* Увеличили в 2 раза */
+    }
+
+    /* Добавляем стили для кнопки назад */
+    #backButton {
+        font-weight: bold;
+        font-size: 35px;
+        padding: 31px 50px;
+        width: 350px;
+        border-radius: 31px;
+        background: linear-gradient(145deg, #ffd700 0%, #ffa500 100%);
+        color: #4a2982;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        outline: none;
+        font-family: 'Intro', sans-serif;
+        display: block;
+        position: absolute;
+        left: 50%;
+        top: 80%;  /* Располагаем под кнопкой БРОСИТЬ */
+        transform: translateX(-50%);
+        border: 4px solid #ffd700;
+        box-shadow:
+            0 10px 31px rgba(255, 215, 0, 0.3),
+            0 -4px 15px rgba(255, 215, 0, 0.2) inset,
+            0 8px 0 #b8860b;
+        text-shadow: 0 3px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    #backButton:hover {
+        transform: translateX(-50%) translateY(-4px);
+        background: linear-gradient(145deg, #ffd700 0%, #ffb700 100%);
+        box-shadow:
+            0 15px 38px rgba(255, 215, 0, 0.4),
+            0 -4px 15px rgba(255, 215, 0, 0.2) inset,
+            0 10px 0 #b8860b;
+    }
+
+    #backButton:active {
+        transform: translateX(-50%) translateY(4px);
+        box-shadow:
+            0 5px 19px rgba(255, 215, 0, 0.3),
+            0 -4px 15px rgba(255, 215, 0, 0.2) inset,
+            0 4px 0 #b8860b;
+    }
+</style>
+</head>
+<body class="hidden">
+    <div class="back-arrow" onclick="window.location.href='../index.html'">
+        <span class="material-icons">arrow_back</span>
+    </div>
+    <div id="container3D"></div>
+    <div class="circles-container">
+        <div class="circle">
+            <span class="question-mark">?</span>
+        </div>
+        <div class="circle">
+            <span class="question-mark">?</span>
+        </div>
+        <div class="circle">
+            <span class="question-mark">?</span>
+        </div>
+        <div class="circle">
+            <span class="question-mark">?</span>
+        </div>
+        <div class="circle">
+            <span class="question-mark">?</span>
+        </div>
+        <div class="circle">
+            <span class="question-mark">?</span>
+        </div>
+        <div class="circle">
+            <span class="question-mark">?</span>
+        </div>
+    </div>
+    <div id="round-counter" class="game-info">
+        <div id="round-number" class="number">0</div>
+        <div class="label">РАУНД</div>
+    </div>
+
+    <div id="multiplier" class="game-info">
+        <div class="number">X1.95</div>
+        <div class="label">КЭФ</div>
+    </div>
+
+    <button id="flipButton">БРОСИТЬ</button>
+    <button id="returnButton" onclick="location.href='../index.html'">Вернуться</button>
+    <button id="resetButton" style="display: none; margin-top: 20px;" class="flipButton">ЗАНОВО</button>
+    <button id="backButton" onclick="window.location.href='../index.html'">НАЗАД</button>
+    <div id="resultText"></div>
+
+    <audio id="not-sound" src="coinnotify.mp3"></audio>
+    <audio id="cl-sound" src="coinclose.mp3"></audio>
+    <audio id="pl-sound" src="coin22.mp3"></audio>
+    <script type="module">
+        import { TWEEN } from 'https://unpkg.com/three@0.139.0/examples/jsm/libs/tween.module.min.js';
+        import * as THREE from "https://cdn.skypack.dev/three@0.129.0/build/three.module.js";
+        import { OrbitControls } from "https://cdn.skypack.dev/three@0.129.0/examples/jsm/controls/OrbitControls.js";
+        import { GLTFLoader } from "https://cdn.skypack.dev/three@0.129.0/examples/jsm/loaders/GLTFLoader.js";
+
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.getElementById("container3D").appendChild(renderer.domElement);
+
+        // Очень сильный рассеянный свет для общей освещенности
+        scene.add(new THREE.AmbientLight(0xffffff, 1));  // Сильно увеличена интенсивность
+
+        // Функция для добавления направленного света с экстремальной интенсивностью
+        const addDirectionalLight = (x, y, z, intensity) => {
+          const light = new THREE.DirectionalLight(0xffffff, intensity);
+          light.position.set(x, y, z);
+          scene.add(light);
+        }
+
+        // Функция для добавления точечного света с экстремальной интенсивностью
+        const addPointLight = (x, y, z, intensity) => {
+          const light = new THREE.PointLight(0xffffff, intensity, 1200);
+          light.position.set(x, y, z);
+          scene.add(light);
+        }
+
+        // Добавляем направленные и точечные света с очень высокой интенсивностью
+        addDirectionalLight(75, 75, 75, 10);
+        addDirectionalLight(-75, 75, 75, 10);
+        addPointLight(0, 75, 25, 8);
+        addPointLight(0, -75, 25, 8);
+
+        const controls = new OrbitControls(camera, renderer.domElement);
+        camera.position.set(0, 0, 100);
+        controls.update();
+
+        let coin = null;
+        const loader = new GLTFLoader();
+        loader.load('scene.gltf', function (gltf) {
+            coin = gltf.scene;
+            coin.scale.set(15, 15, 15);
+            coin.position.y = 13;
+            scene.add(coin);
+            document.body.classList.remove('hidden');
+            animate();
+        }, undefined, function (error) {
+            console.error("An error occurred while loading the model", error);
+        });
+
+        let spinning = true;
+        let currentCircleIndex = 0;  // Индекс текущего круга для заполнения
+
+        function animate() {
+            requestAnimationFrame(animate);
+            if (spinning && coin) {
+                coin.rotation.y += 0.03;
+            }
+            TWEEN.update();
+            controls.update();
+            renderer.render(scene, camera);
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+        const flipButton = document.getElementById("flipButton");
+        const returnButton = document.getElementById("returnButton");
+        const flipSound = new Audio('/static/coinflip.mp3'); // Path to your sound file
+
+        returnButton.addEventListener("touchstart", (e) => {
+            e.preventDefault(); // Предотвратить стандартное поведение для touch (скроллинг и т.д.)
+            returnButton.classList.add("active");
+        });
+
+        returnButton.addEventListener("touchend", (e) => {
+            returnButton.classList.remove("active");
+            location.href = 'https://negociowin.ru/'; // Вызов функции при завершении касания
+        });
+
+        document.getElementById("flipButton").addEventListener("click", () => {
+            if (coin && currentCircleIndex < 7) {
+                document.getElementById('pl-sound').play();
+                document.getElementById("resultText").style.display = 'none';
+                spinning = false;
+                coin.rotation.set(0, 0, 0);
+
+                const upAndDownTween = new TWEEN.Tween(coin.position)
+                    .to({ y: [50, 13] }, 2000)
+                    .easing(TWEEN.Easing.Quadratic.InOut);
+
+                const rotationTween = new TWEEN.Tween(coin.rotation)
+                    .to({ y: coin.rotation.y + Math.PI * 10 }, 2000)
+                    .easing(TWEEN.Easing.Quadratic.InOut)
+                    .onComplete(() => {
+                        const result = Math.random() < 0.5 ? "Орел" : "Решка";
+                        const resultText = document.getElementById("resultText");
+                        resultText.textContent = result;
+                        resultText.style.display = 'block';
+                        resultText.classList.add("fadeInScaleUp");
+
+                        // Заполняем текущий круг
+                        const circles = document.querySelectorAll('.circle');
+                        const currentCircle = circles[currentCircleIndex];
+                        
+                        // Создаем и добавляем изображение
+                        const img = document.createElement('img');
+                        img.src = result === "Орел" ? '/static/coin2.png' : '/static/coin1.png';
+                        
+                        // Удаляем знак вопроса и добавляем изображение
+                        const questionMark = currentCircle.querySelector('.question-mark');
+                        if (questionMark) {
+                            questionMark.style.display = 'none';
+                        }
+                        
+                        currentCircle.appendChild(img);
+                        currentCircle.classList.add('filled');
+                        
+                        currentCircleIndex++;  // Увеличиваем индекс для следующего круга
+
+                        // Если все круги заполнены, можно добавить дополнительную логику
+                        if (currentCircleIndex === 7) {
+                            // Например, заблокировать кнопку или показать сообщение
+                            document.getElementById("flipButton").disabled = true;
+                        }
+                    });
+
+                // Delay sound playback by 1 second
+                setTimeout(() => {
+                    flipSound.play();
+                }, 800);
+
+                upAndDownTween.start();
+                rotationTween.start();
+
+                // Обновление номера раунда и множителя
+                const roundNumber = document.getElementById("round-number");
+                const currentRound = parseInt(roundNumber.textContent);
+                const nextRound = currentRound + 1;
+
+                if (currentRound < 7) {
+                    roundNumber.textContent = nextRound;
+                }
+
+                // Определяем множитель в зависимости от следующего раунда
+                const multiplier = document.querySelector("#multiplier .number");
+                let multiplierValue;
+                
+                if (currentCircleIndex === 6) { // Если это последний бросок
+                    multiplierValue = "X124.8";
+                    document.getElementById("resetButton").style.display = "block";
+                    document.getElementById("flipButton").disabled = true;
+                    // Добавляем класс для последнего множителя
+                    multiplier.classList.add('last-multiplier');
+                } else {
+                    // Убираем класс last-multiplier если он был
+                    multiplier.classList.remove('last-multiplier');
+                    switch(nextRound) {
+                        case 2:
+                            multiplierValue = "X3.9";
+                            break;
+                        case 3:
+                            multiplierValue = "X7.8";
+                            break;
+                        case 4:
+                            multiplierValue = "X15.6";
+                            break;
+                        case 5:
+                            multiplierValue = "X15.6";
+                            break;
+                        case 6:
+                            multiplierValue = "X31.2";
+                            multiplier.classList.add('last-multiplier');
+                            break;
+                        case 7:
+                        case 8:  // Добавляем case 8 для второго появления 7-го раунда
+                            multiplierValue = "X124.8";
+                            multiplier.classList.add('last-multiplier');
+                            break;
+                        default:
+                            multiplierValue = "X1.95";
+                    }
+                }
+
+                multiplier.textContent = multiplierValue;
+            }
+        });
+
+        // Добавляем обработчик для кнопки "Заново"
+        document.getElementById("resetButton").addEventListener("click", () => {
+            // Сбрасываем все значения
+            currentCircleIndex = 0;
+            document.getElementById("round-number").textContent = "1";
+            document.querySelector("#multiplier .number").textContent = "X1.95";
+            
+            // Очищаем круги
+            const circles = document.querySelectorAll('.circle');
+            circles.forEach(circle => {
+                circle.classList.remove('filled');
+                const img = circle.querySelector('img');
+                if (img) {
+                    img.remove();
+                }
+                const questionMark = circle.querySelector('.question-mark');
+                if (questionMark) {
+                    questionMark.style.display = 'block';
+                }
+            });
+            
+            // Скрываем кнопку "Заново"
+            document.getElementById("resetButton").style.display = "none";
+            // Разблокируем кнопку "Бросить"
+            document.getElementById("flipButton").disabled = false;
+        });
+    });
+
+        window.addEventListener("resize", function () {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+        function showNotification() {
+            document.getElementById('not-sound').play();
+            const notification = document.getElementById('notification');
+            notification.style.display = 'block'; // Сразу делаем элемент блочным, чтобы начать анимацию
+            notification.style.top = '-10%'; // Начальное положение для анимации появления
+            notification.style.opacity = '0'; // Начальная прозрачность
+
+            // Плавное появление
+            setTimeout(() => {
+                notification.style.opacity = '1';
+                notification.style.top = '10%';
+            }, 10);
+
+            // Планирование плавного исчезновения
+            setTimeout(() => {
+                hideNotification();
+            }, 10000); // Отображаем уведомление в течение 10 секунд
+        }
+
+        function hideNotification() {
+            document.getElementById('cl-sound').play();
+            const notification = document.getElementById('notification');
+            notification.style.opacity = '0';
+            notification.style.top = '-10%';
+
+            setTimeout(() => {
+                notification.style.display = 'none';
+            }, 1000); // Даем время на завершение анимации исчезновения
+        }
+
+        function startRandomNotification() {
+            showNotification();
+            setTimeout(startRandomNotification,  20000); // Следующее уведомление через 20 секунд
+        }
+
+        document.addEventListener('DOMContentLoaded', startRandomNotification);
+
+        // Добавляем функцию для сброса игры (можно вызывать при необходимости)
+        function resetGame() {
+            currentCircleIndex = 0;
+            const circles = document.querySelectorAll('.circle');
+            circles.forEach(circle => {
+                circle.classList.remove('filled');
+                const img = circle.querySelector('img');
+                if (img) {
+                    img.remove();
+                }
+                const questionMark = circle.querySelector('.question-mark');
+                if (questionMark) {
+                    questionMark.style.display = 'block';
+                }
+            });
+            document.getElementById("flipButton").disabled = false;
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Устанавливаем начальный множитель X1.95
+            const multiplier = document.querySelector("#multiplier .number");
+            multiplier.textContent = "X1.95";
+        });
+    </script>
+</body>
+</html>
