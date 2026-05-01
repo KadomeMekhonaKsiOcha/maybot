@@ -1,0 +1,354 @@
+/* Подключение шрифта Intro */
+@font-face {
+    font-family: "Intro";
+    src: url('./intro.otf') format('opentype');
+}
+
+/* Основные стили для страницы */
+body {
+    touch-action: none; /* Отключаем стандартные жесты, такие как зум */
+    user-select: none;  /* Отключаем выделение текста */
+    font-family: "Intro", Arial, sans-serif;
+    background-color: #171717; /* Тёмно-серый фон */
+    color: #ffffff; /* Белый текст */
+    display: flex;
+    justify-content: center; /* Центрирование по вертикали */
+    align-items: center; /* Центрирование по горизонтали */
+    height: 94vh; /* Высота страницы */
+    margin: 0;
+    padding: 0;
+    text-align: center; /* Центрирование текста */
+    overflow: hidden; /* Убираем прокрутку */
+    position: relative; /* Для управления слоями */
+    z-index: 0; /* Фон на заднем плане */
+}
+
+.winner {
+  
+    display: block;
+    width: 300px;
+    margin: 0;
+    position: relative;
+}
+
+.logo {
+   
+    display: block;
+    width: 280px;
+    margin-top: -60px;
+    margin-left: 10px;
+    position: absolute;
+}
+
+.button2 {
+    width: 220px;
+    height: 80px;
+    border-radius: 30px;
+    margin-top: 280px;
+    font-size: 35px;
+    font-style: italic;
+    font-weight: 600;
+    line-height: 20px;
+    letter-spacing: 0.08em;
+    text-align: center;
+    position: absolute;
+    top: 50%; /* Центрировать по вертикали */
+    left: 50%; /* Центрировать по горизонтали */
+    transform: translate(-50%, -50%); /* Смещение для точного центрирования */
+    border: none;
+    display: inline-block;
+    color: rgb(221, 221, 221);
+    text-shadow: rgb(138, 138, 138) 0px 0px 20px;
+    background: linear-gradient(263.87deg, #0055c4 0%, #003f99 100%);
+    box-shadow: rgba(25, 201, 245, 0.1) 0px 10px 20px, rgba(92, 36, 252, 0.1) 0px 10px 20px, #0055c4 0px -2px 4px inset, #003f99 0px -8px 8px inset;
+    cursor: pointer;
+}
+
+
+
+.main-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center; /* Центрирование элементов */
+    gap: 5px; /* Минимальное расстояние между элементами */
+    width: 90%; /* Адаптация ширины */
+    height: 95%; /* Адаптация высоты */
+    position: relative;
+    z-index: 2; /* Интерфейс над снегом */
+}
+
+/* Анимационная надпись "RICHMOND" */
+#loading-text {
+    margin-bottom: 5px; /* Минимальный отступ от сетки */
+}
+
+#loading-text span {
+    display: inline-block;
+    animation: bounce 0.3s ease infinite alternate; /* Анимация прыжков */
+    font-size: 50px; /* Размер букв */
+    color: rgb(0, 255, 26); /* Золотистый цвет текста */
+    text-shadow: 
+        0 0.25px 0 #ccc, 
+        0 0.5px 0 #ccc, 
+        0 0.75px 0 #ccc, 
+        0 1px 0 #ccc,
+        0 1.25px 0 #ccc, 
+        0 1.5px 0 transparent, 
+        0 1.75px 0 transparent, 
+        0 2px 0 transparent,
+        0 2.25px 0 transparent, 
+        0 12.5px 6.25px rgba(0, 0, 0, 0.1); /* Белая тень */
+}
+
+#loading-text span:nth-child(1) { animation-delay: 0s; }
+#loading-text span:nth-child(2) { animation-delay: 0.1s; }
+#loading-text span:nth-child(3) { animation-delay: 0.2s; }
+#loading-text span:nth-child(4) { animation-delay: 0.3s; }
+#loading-text span:nth-child(5) { animation-delay: 0.4s; }
+#loading-text span:nth-child(6) { animation-delay: 0.5s; }
+#loading-text span:nth-child(7) { animation-delay: 0.6s; }
+#loading-text span:nth-child(8) { animation-delay: 0.7s; }
+
+@keyframes bounce {
+    0% {
+        transform: translateY(0px); /* Исходное положение */
+    }
+    100% {
+        transform: translateY(-5px); /* Лёгкий подъём вверх */
+    }
+}
+
+/* Анимация снега */
+.snow {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1;
+    overflow: hidden;
+}
+
+.snowflake {
+    position: absolute;
+    top: -10px;
+    background-color: white;
+    border-radius: 50%;
+    opacity: 0.8;
+    animation: fall 7s linear infinite, sway ease-in-out infinite;
+}
+
+@keyframes fallAndSway {
+    0% {
+        transform: translate(0, 0); /* Сверху и без отклонения */
+    }
+    50% {
+        transform: translate(20px, 50vh); /* Движение вправо и вниз на половину экрана */
+    }
+    100% {
+        transform: translate(0, 120vh); /* Вниз и возврат по X */
+    }
+}
+
+.snowflake {
+    position: absolute;
+    top: -10px;
+    background-color: white;
+    border-radius: 50%;
+    opacity: 0.8;
+    animation: fallAndSway 5s linear infinite; /* Используем объединенную анимацию */
+}
+
+/* Фон за сеткой */
+.grid-background {
+    background-color: #2b2b2b; /* Тёмно-серый фон */
+    border-radius: 7px; /* Скруглённые углы */
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.7); /* Свечение */
+    padding: 5px;
+    display: flex;
+    justify-content: center; /* Центрируем содержимое */
+    align-items: center; /* Центрируем по вертикали */
+    margin-bottom: 3px; /* Минимальный отступ от подписи */
+    max-width: 380px; /* Адаптировано под размеры ячеек */
+}
+
+/* Сетка ячеек */
+.grid {
+    display: grid;
+    grid-template-columns: repeat(5, 60px); /* Уменьшенные размеры ячеек */
+    grid-gap: 5px; /* Промежуток между ячейками */
+    justify-content: center; /* Центрируем сетку */
+}
+
+/* Стили для ячеек */
+.cell {
+    width: 60px;
+    height: 40px; /* Сохранение пропорций */
+    background-image: url('./cell.jpg'); /* Фон для закрытого состояния ячейки */
+    background-size: cover;
+    background-position: center;
+    border-radius: 6px;
+    transition: transform 0.5s ease, background-image 0.5s ease;
+}
+
+.cell.active {
+    background-image: url('./active.jpg'); /* Фон для активного состояния ячейки */
+    background-size: cover;
+    background-position: center;
+    transform: scale(1.1); /* Увеличение ячейки при активации */
+}
+
+.cell:hover {
+    transform: scale(1.05); /* Лёгкое увеличение при наведении */
+}
+
+/* Подпись "Количество ловушек" */
+.cell-count-label {
+    font-size: 28px;
+    color: #ffffff;
+    margin: 5px 0; /* Минимальный отступ сверху и снизу */
+    text-align: center;
+}
+
+/* Контейнер управления количеством ловушек */
+#counter-container {
+    display: flex;
+    justify-content: center; /* Центрируем контейнер */
+    align-items: center; /* Центрируем содержимое */
+    margin-bottom: 5px; /* Минимальный отступ снизу */
+    gap: 7px; /* Расстояние между кнопками */
+}
+
+/* Счётчик ловушек */
+#trap-count {
+    font-size: 35px;
+    font-weight: bold;
+    color: white;
+    padding: 0 5px;
+}
+
+/* Кнопки "+" и "-" */
+#minus-btn, #plus-btn {
+    background: none; /* Убираем стандартный фон кнопки */
+    border: none; /* Убираем стандартную рамку кнопки */
+    padding: 0; /* Убираем отступы */
+    cursor: pointer; /* Курсор-указатель при наведении */
+    display: flex;
+    justify-content: center; /* Центрируем изображение */
+    align-items: center; /* Центрируем изображение */
+    width: 50px; /* Уменьшенная ширина кнопки */
+    height: 50px; /* Уменьшенная высота кнопки */
+    transition: transform 0.3s; /* Анимация при наведении */
+}
+
+#minus-btn img, #plus-btn img {
+    width: 100%; /* Изображение занимает всю кнопку */
+    height: 100%;
+    object-fit: contain; /* Корректное масштабирование */
+}
+
+#minus-btn:hover, #plus-btn:hover {
+    transform: scale(1.1); /* Увеличение кнопки при наведении */
+}
+
+/* Кнопка "Получить сигнал" */
+#highlight-btn {
+    font-family: "Intro", Arial, sans-serif; /* Шрифт Intro */
+    background-color: #0055c4; /* Синий фон */
+    color: white;
+    font-size: 20px;
+    padding: 15px 50px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: background-color 0.3s, transform 0.3s, box-shadow 0.3s;
+    margin-top: 5px; /* Минимальный отступ сверху */
+}
+
+#highlight-btn:hover {
+    background-color: #003f99;
+    transform: scale(1.05);
+    box-shadow: 0 8px 15px rgba(0, 85, 196, 0.4); /* Тень при наведении */
+}
+.tab {
+    position: fixed;
+    bottom: 0;
+    z-index: 10;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    background-color: #333;
+    padding: 10px 0;
+    border-radius: 50px;
+    height: 70px; /* Фиксированная высота для десктопа */
+}
+
+.tab button {
+    background-color: inherit;
+    flex: 1 0 auto;
+    margin: 0 10px;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    padding: 14px 20px;
+    transition: 0.3s;
+    color: #fff;
+    text-align: center;
+    border-radius: 50px;
+    font-size: 16px;
+    font-family: 'Intro', Arial, sans-serif;
+}
+
+.tab button img {
+    max-width: 38px;
+    height: 38px;
+}
+
+.tab button:hover {
+    background-color: #555;
+    transform: translateY(-2px);
+}
+
+.tab button.active {
+    background-color: #666;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+}
+
+/* Медиазапросы для адаптации на мобильных устройствах */
+@media (max-width: 768px) {
+    .tab {
+        height: 70px; /* Фиксированная высота для планшетов */
+    }
+
+    .tab button {
+        margin: 0 5px;
+        padding: 10px 15px;
+        font-size: 14px;
+    }
+
+    .tab button img {
+        max-width: 32px;
+        height: 32px;
+    }
+}
+
+@media (max-width: 480px) {
+    .tab {
+        height: 70px; /* Фиксированная высота для мобильных устройств */
+    }
+
+
+    .tab button {
+        margin: 0 3px;
+        padding: 8px 12px;
+        font-size: 12px;
+    }
+
+    .tab button img {
+        max-width: 28px;
+        height: 28px;
+    }
+}
