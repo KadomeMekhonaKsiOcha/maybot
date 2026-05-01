@@ -1,0 +1,699 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Game</title>
+  <link href="css2@family=Poppins%253Awght@400%3B700&amp;display=swap.css" rel="stylesheet">
+  <style>
+    :root {
+      --sky-blue: #87CEEB;
+      --light-sky-blue: #B0E2FF;
+      --light-cyan: #E0FFFF;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      background: #87CEEB; /* Fallback цвет */
+    }
+
+    /* Добавляем градиентный фон через псевдоэлемент */
+    body::before {
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: #87CEEB;
+        background: -webkit-gradient(linear, left top, left bottom,
+            from(#87CEEB),
+            color-stop(50%, #B0E2FF),
+            to(#E0FFFF));
+        background: -moz-linear-gradient(top,
+            #87CEEB 0%,
+            #B0E2FF 50%,
+            #E0FFFF 100%);
+        background: linear-gradient(to bottom,
+            #87CEEB 0%,
+            #B0E2FF 50%,
+            #E0FFFF 100%);
+        z-index: 0;
+        pointer-events: none;
+    }
+
+    body {
+      font-family: "Arial", sans-serif;
+      overflow: hidden;
+      background-color: var(--sky-blue);
+      background-image: -webkit-linear-gradient(top,
+        var(--sky-blue) 0%,
+        var(--light-sky-blue) 50%,
+        var(--light-cyan) 100%);
+      background-image: linear-gradient(to bottom,
+        var(--sky-blue) 0%,
+        var(--light-sky-blue) 50%,
+        var(--light-cyan) 100%);
+      background-size: 100% 100%;
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+      -webkit-background-size: 100% 100%;
+      -moz-background-size: 100% 100%;
+      -o-background-size: 100% 100%;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+    }
+
+    /* Сбрасываем стандартные стили */
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    /* Добавляем стили для html */
+    html {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+    }
+
+    /* Обновляем стили для body */
+    body {
+        font-family: "Arial", sans-serif;
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+        background: linear-gradient(180deg,
+            #87CEEB 0%,    /* Sky Blue */
+            #B0E2FF 50%,   /* Light Sky Blue */
+            #E0FFFF 100%   /* Light Cyan */
+        );
+        background-attachment: fixed;
+        min-height: 100vh;
+        width: 100%;
+        position: relative;
+        left: 0;
+        top: 0;
+    }
+
+    /* Создаем контейнер для анимированного фона */
+    .animated-background {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 1;
+        overflow: hidden;
+    }
+
+    /* Единый стиль для всех облаков */
+    .cloud {
+        position: absolute;
+        width: 300px;
+        height: 100px;
+        background: #fff;
+        border-radius: 100px;
+        box-shadow:
+            0 8px 15px rgba(0, 0, 0, 0.1),
+            inset 0 -5px 15px rgba(0, 0, 0, 0.1),
+            inset 0 5px 15px rgba(255, 255, 255, 0.8);
+        animation: float linear infinite;
+        opacity: 0.9;
+    }
+
+    .cloud::before,
+    .cloud::after {
+        content: '';
+        position: absolute;
+        background: inherit;
+        border-radius: 50%;
+        box-shadow: inherit;
+    }
+
+    .cloud::before {
+        width: 170px;
+        height: 120px;
+        top: -55px;
+        left: 40px;
+    }
+
+    .cloud::after {
+        width: 120px;
+        height: 120px;
+        top: -45px;
+        right: 50px;
+    }
+
+    /* Позиционирование облаков */
+    .cloud-1 {
+        top: 10%;
+        animation-duration: 60s;
+    }
+
+    .cloud-2 {
+        top: 30%;
+        transform: scale(0.8);
+        animation-duration: 45s;
+        animation-delay: -15s;
+    }
+
+    .cloud-3 {
+        top: 50%;
+        transform: scale(0.9);
+        animation-duration: 52s;
+        animation-delay: -30s;
+    }
+
+    .cloud-4 {
+        top: 70%;
+        transform: scale(0.7);
+        animation-duration: 48s;
+        animation-delay: -20s;
+    }
+
+    .cloud-5 {
+        top: 85%;
+        transform: scale(0.85);
+        animation-duration: 55s;
+        animation-delay: -40s;
+    }
+
+    @keyframes float {
+        from {
+            transform: translateX(-300px);
+            left: -300px;
+        }
+        to {
+            transform: translateX(calc(100vw + 300px));
+            left: 100%;
+        }
+    }
+
+    /* Добавляем легкое свечение */
+    .cloud::after {
+        filter: blur(5px);
+    }
+
+    /* Обновляем стили для панели ставок */
+    .betting-panel {
+        position: fixed;
+        top: 50vh;
+        left: 50vw;
+        transform: translate(-50%, -50%);
+        width: 380px;
+        height: fit-content;
+        opacity: 0;
+        padding: 40px;
+        border-radius: 24px;
+        background: rgba(255, 255, 255, 0.92);
+        z-index: 3;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 25px;
+        transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        backdrop-filter: blur(10px);
+        box-shadow:
+            0 20px 40px rgba(0, 0, 0, 0.1),
+            0 0 0 1px rgba(255, 255, 255, 0.5) inset,
+            0 0 30px rgba(255, 255, 255, 0.3);
+        margin-left: -8px;
+    }
+
+    .betting-panel.visible {
+        opacity: 1;
+    }
+
+    .betting-panel.hiding {
+        opacity: 0;
+    }
+
+    .title {
+      font-size: 22px;
+      color: #2C3E50;
+      text-align: center;
+      font-weight: 600;
+      margin-bottom: 5px;
+      letter-spacing: 0.5px;
+    }
+
+    /* Обновленный селектор валюты */
+    .currency-selector {
+      display: flex;
+      gap: 12px;
+      background: rgba(255, 255, 255, 0.95);
+      padding: 8px;
+      border-radius: 16px;
+      box-shadow:
+          0 2px 8px rgba(0, 0, 0, 0.05),
+          inset 0 0 0 1px rgba(255, 140, 0, 0.1);
+    }
+
+    .currency-selector label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 20px;
+      font-size: 16px;
+      color: #2C3E50;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border-radius: 12px;
+      background: transparent;
+    }
+
+    .currency-selector label:hover {
+      background: rgba(255, 140, 0, 0.08);
+    }
+
+    .currency-selector input[type="radio"] {
+      display: none;
+    }
+
+    .currency-selector input[type="radio"] + span {
+      position: relative;
+      padding-left: 25px;
+    }
+
+    .currency-selector input[type="radio"] + span:before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 18px;
+      height: 18px;
+      border: 2px solid rgba(255, 140, 0, 0.5);
+      border-radius: 50%;
+      transition: all 0.3s ease;
+    }
+
+    .currency-selector input[type="radio"]:checked + span:before {
+      border-color: #FF8C00;
+      background: #FF8C00;
+      box-shadow: inset 0 0 0 4px #fff;
+    }
+
+    /* Обновленное поле ввода */
+    .bet-input {
+      width: 100%;
+      padding: 16px 20px;
+      font-size: 18px;
+      border: 2px solid rgba(255, 140, 0, 0.2);
+      border-radius: 16px;
+      text-align: center;
+      transition: all 0.3s ease;
+      background: rgba(255, 255, 255, 0.95);
+      color: #2C3E50;
+      font-weight: 500;
+    }
+
+    .bet-input:focus {
+      outline: none;
+      border-color: #FF8C00;
+      box-shadow:
+          0 0 0 4px rgba(255, 140, 0, 0.15),
+          0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+
+    .bet-input::placeholder {
+      color: #95A5A6;
+    }
+
+    /* Обновленная кнопка подтверждения */
+    .confirm-button {
+      width: 100%;
+      padding: 16px;
+      font-size: 18px;
+      font-weight: 600;
+      color: #fff;
+      background: linear-gradient(135deg, #FF8C00, #FFA500);
+      border: none;
+      border-radius: 16px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow:
+          0 4px 12px rgba(255, 140, 0, 0.3),
+          inset 0 2px 4px rgba(255, 255, 255, 0.3);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .confirm-button:hover:not(:disabled) {
+      transform: translateY(-2px);
+      background: linear-gradient(135deg, #FFA500, #FFB52E);
+      box-shadow:
+          0 6px 15px rgba(255, 140, 0, 0.4),
+          inset 0 2px 4px rgba(255, 255, 255, 0.3);
+    }
+
+    .confirm-button:active:not(:disabled) {
+      transform: translateY(0);
+    }
+
+    .confirm-button:disabled {
+      background: linear-gradient(135deg, #D1D1D1, #E0E0E0);
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    /* Добавляем разделитель */
+    .betting-panel::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 60px;
+      height: 4px;
+      background: rgba(255, 140, 0, 0.2);
+      border-radius: 2px;
+      margin-bottom: 15px;
+    }
+
+    /* Контейнер шара */
+    .ball-container {
+      position: relative;
+      width: 500px;
+      height: 200px;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-bottom: -20px;
+    }
+
+    .center-image {
+      width: 100%;
+      height: auto;
+      transition: transform 0.1s ease-in-out;
+    }
+
+    .bet-display {
+      position: absolute;
+      top: 45%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 22px;
+      font-weight: bold;
+      color: #fff;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+      pointer-events: none;
+      transition: transform 0.1s ease, opacity 0.1s ease;
+      font-family: "Poppins", sans-serif;
+    }
+
+    .restart-button img {
+      width: 30px;
+      height: 30px;
+    }
+
+    /* Стили для кнопки "Начать" */
+    .start-button {
+        position: relative;
+        padding: 16px 45px;
+        font-size: 20px;
+        font-weight: 600;
+        color: #fff;
+        background: linear-gradient(135deg, #FF8C00, #FFA500);
+        border: none;
+        border-radius: 50px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow:
+            0 10px 20px rgba(255, 140, 0, 0.3),
+            inset 0 -2px 5px rgba(0, 0, 0, 0.2),
+            inset 0 2px 5px rgba(255, 255, 255, 0.2);
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        z-index: 100;
+        margin-top: -10px;
+    }
+
+    .start-button:hover {
+        transform: translateY(-3px);
+        background: linear-gradient(135deg, #FFA500, #FFB52E);
+        box-shadow:
+            0 15px 25px rgba(255, 140, 0, 0.4),
+            inset 0 -2px 5px rgba(0, 0, 0, 0.2),
+            inset 0 2px 5px rgba(255, 255, 255, 0.2);
+    }
+
+    .start-button:active {
+        transform: translateY(-1px);
+    }
+
+    * {
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    /* Обновляем стили для game-content */
+    .game-content {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 30px;
+        overflow: hidden;
+        margin: 0;
+        padding: 0;
+        z-index: 2;
+    }
+    .restart-button {
+      position: relative;
+      padding: 16px 45px;
+      font-size: 20px;
+      font-weight: 600;
+      color: #fff;
+      background: linear-gradient(135deg, #FF8C00, #FFA500);
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow:
+          0 10px 20px rgba(255, 140, 0, 0.3),
+          inset 0 -2px 5px rgba(0, 0, 0, 0.2),
+          inset 0 2px 5px rgba(255, 255, 255, 0.2);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      z-index: 100;
+      margin-top: -10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+  }
+
+  .restart-button:hover {
+      transform: translateY(-3px);
+      background: linear-gradient(135deg, #FFA500, #FFB52E);
+      box-shadow:
+          0 15px 25px rgba(255, 140, 0, 0.4),
+          inset 0 -2px 5px rgba(0, 0, 0, 0.2),
+          inset 0 2px 5px rgba(255, 255, 255, 0.2);
+  }
+
+  .restart-button:active {
+      transform: translateY(-1px);
+  }
+
+  .restart-button img {
+      width: 24px;
+      height: 24px;
+      filter: brightness(0) invert(1); /* Делаем иконку белой */
+  }
+  </style>
+</head>
+<body>
+  <div class="game-content">
+    <!-- Шар и кнопка "Начать" -->
+   <div class="ball-container">
+  <img
+    src="ballvue.png"
+    alt="Ball Icon"
+    class="center-image"
+    id="ball"
+  />
+  <div class="bet-display" id="betDisplay" style="opacity: 0;">
+    ₽0.00
+  </div>
+</div>
+      <button class="start-button" id="startButton">Начать</button>
+      <button class="start-button" onclick="window.location.href='../index.html'" style="margin-top: 20px;">Назад</button>
+      <button class="restart-button" id="restartButton" style="display: none;">
+        <img src="50/000000/restart.png" alt="Restart Icon" />
+      </button>
+    </div>
+
+    <!-- Панель выбора валюты и ставки -->
+    <div class="betting-panel" id="bettingPanel" style="display: none;">
+      <h2 class="title">Выберите валюту и введите сумму ставки:</h2>
+      <div class="currency-selector">
+        <label>
+          <input type="radio" name="currency" value="₽" id="currencyRub" />
+          <span>Рубль</span>
+        </label>
+        <label>
+          <input type="radio" name="currency" value="$" id="currencyUsd" />
+          <span>Доллар</span>
+        </label>
+      </div>
+      <input
+        type="number"
+        id="betAmount"
+        placeholder="Введите сумму ставки"
+        class="bet-input"
+      />
+      <button class="confirm-button" id="confirmButton" disabled>Подтвердить</button>
+    </div>
+  </div>
+
+  <!-- Добавляем разметку для анимированного фона -->
+  <div class="animated-background">
+    <div class="cloud cloud-1"></div>
+    <div class="cloud cloud-2"></div>
+    <div class="cloud cloud-3"></div>
+    <div class="cloud cloud-4"></div>
+    <div class="cloud cloud-5"></div>
+  </div>
+
+<script>
+  const startButton = document.getElementById("startButton");
+  const bettingPanel = document.getElementById("bettingPanel");
+  const confirmButton = document.getElementById("confirmButton");
+  const betDisplay = document.getElementById("betDisplay");
+  const ball = document.getElementById("ball");
+  const betInput = document.getElementById("betAmount");
+  const currencyInputs = document.querySelectorAll("input[name='currency']");
+  const ballContainer = document.querySelector(".ball-container");
+
+  let betAmount = 0;
+  let selectedCurrency = "";
+
+  // Начать игру
+  startButton.addEventListener("click", () => {
+    bettingPanel.style.display = "flex"; // Установить display для отображения панели
+    setTimeout(() => {
+      bettingPanel.classList.add("visible"); // Добавить класс для запуска анимации
+    }, 10); // Небольшая задержка, чтобы анимация сработала
+    startButton.style.display = "none";
+  });
+
+  // Проверка на активацию кнопки "Подтвердить"
+  function updateConfirmButtonState() {
+    const isCurrencySelected = Array.from(currencyInputs).some(input => input.checked);
+    const isAmountValid = parseFloat(betInput.value) > 0;
+    confirmButton.disabled = !(isCurrencySelected && isAmountValid);
+  }
+
+  // Обработчик для ввода суммы
+  betInput.addEventListener("input", updateConfirmButtonState);
+
+  // Обработчик для выбора валюты
+  currencyInputs.forEach(input => {
+    input.addEventListener("change", updateConfirmButtonState);
+  });
+
+  // Подтвердить ставку
+  confirmButton.addEventListener("click", () => {
+    betAmount = parseFloat(betInput.value) || 0;
+    selectedCurrency = document.querySelector("input[name='currency']:checked").value;
+
+    betDisplay.innerHTML = `${selectedCurrency}${betAmount.toFixed(2)}`;
+    betDisplay.style.opacity = 1;
+
+    // Убираем панель с анимацией
+    bettingPanel.classList.remove("visible");
+    bettingPanel.classList.add("hiding");
+    restartButton.style.display = "block"; // Показать кнопку Restart
+
+    // После завершения анимации скрываем панель
+    setTimeout(() => {
+      bettingPanel.style.display = "none";
+      bettingPanel.classList.remove("hiding"); // Сбрасываем класс для следующего показа
+    }, 400); // Время соответствует transition в CSS
+
+    // Прокрутка вверх
+    window.scrollTo(0, 0);
+
+    animateBallAndBet();
+  });
+
+  // Функция для генерации случайного множителя с весами
+  function getRandomMultiplier() {
+    const ranges = [
+      { min: 2.0, max: 3.0, weight: 0.4 }, // 40% вероятность для диапазона 2.0–3.0
+      { min: 3.0, max: 3.5, weight: 0.3 }, // 30% вероятность для диапазона 3.0–3.5
+      { min: 3.5, max: 4.0, weight: 0.2 }, // 20% вероятность для диапазона 3.5–4.0
+      { min: 4.0, max: 5.0, weight: 0.1 }, // 10% вероятность для диапазона 4.0+
+    ];
+
+    const totalWeight = ranges.reduce((sum, range) => sum + range.weight, 0);
+    let random = Math.random() * totalWeight;
+
+    for (const { min, max, weight } of ranges) {
+      if (random < weight) {
+        return Math.random() * (max - min) + min; // Случайное значение в выбранном диапазоне
+      }
+      random -= weight;
+    }
+  }
+
+  // Анимация шара и текста
+  function animateBallAndBet() {
+    let scale = 1;
+    let currentBet = betAmount;
+    const multiplier = getRandomMultiplier(); // Генерация случайного множителя
+    const maxScale = 1.8; // Максимальное увеличение шара
+    const maxTextScale = 1.6; // Максимальное увеличение текста
+    const speed = 100 / multiplier; // Скорость зависит от множителя
+
+    const interval = setInterval(() => {
+      if (scale >= maxScale) {
+        clearInterval(interval);
+      } else {
+        scale += 0.05;
+        currentBet = betAmount * (scale / maxScale) * multiplier;
+
+        // Увеличиваем размеры контейнера пропорционально масштабу шара
+        const newSize = 200 * scale; // Базовый размер контейнера (200px) умножаем на scale
+        ballContainer.style.width = `${newSize}px`;
+        ballContainer.style.height = `${newSize}px`;
+
+        // Масштабируем шар
+        ball.style.transform = `scale(${scale})`;
+        ball.style.transition = "transform 0.1s ease-in-out";
+
+        // Обновляем текст ставки
+        betDisplay.style.transform = `translate(-50%, -50%) scale(${Math.min(scale, maxTextScale)})`;
+        betDisplay.style.fontSize = `${13 + (5 * Math.min(scale, maxTextScale))}px`;
+        betDisplay.innerHTML = `${selectedCurrency}${currentBet.toFixed(2)}`;
+      }
+    }, speed);
+  }
+  restartButton.addEventListener("click", () => {
+    bettingPanel.style.display = "none";
+    startButton.style.display = "block";
+    restartButton.style.display = "none"; // Скрыть кнопку Restart
+    betDisplay.style.opacity = 0; // Сбросить отображение ставки
+    ball.style.transform = "scale(1)"; // Вернуть шар в исходное состояние
+    ball.style.transition = "none"; // Убрать анимацию
+  });
+</script>
+
+</body>
+</html>

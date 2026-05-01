@@ -1,0 +1,42 @@
+﻿<html lang="en"><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="./static/Aviator/style.css">
+  <title>Aviator</title>
+<style type="text/css" id="operaUserStyle"></style></head>
+
+<style>
+@font-face {
+  font-family: 'Intro';
+  src: url('static/intro.otf') format('opentype');}
+</style>
+
+<body>
+  <script src="./static/Aviator/script.js"></script>
+  <div style="position: absolute;">
+    <div class="container">
+      <img class="pers-animate" src="./static/Aviator/resource/plane top.svg" alt="plane">
+      <div class="print-signal-button" id="get-signal" style="z-index: 11;">
+        <span >GET<br>SIGNAL</span>
+      </div>
+      <div class="print-signal" style="position: absolute;">
+        <span id="print-signal"></span>
+      </div>
+        <div class="stop-signal-time deactivate" id="stop-signal-time-block">
+          <p class="stop-timer" id="stop-timer"></p>
+          <div class="stop-progress" id="stop-progress"></div>
+        </div>
+      <div class="tab">
+          <button class="tablinks games-icon" data-tab="Games" onclick="window.location.href=&#39;../index.html&#39;;">
+              <img src="back.png" alt="Игры">
+          </button>
+      </div>
+      <div class="top-content">
+        <img draggable="false" src="./static/Aviator/resource/logo.svg" alt="logo" class="logo-game">
+      </div>  
+    </div>
+  </div>
+
+  <script src="./static/Aviator/main.js"></script>
+</body></html>
+

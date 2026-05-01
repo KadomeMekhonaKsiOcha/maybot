@@ -1,0 +1,322 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  body {
+    margin: 0%;
+    background: rgb(17, 17, 19);
+    font-family: "Inter", sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    color: #ffffff;
+  }
+
+body, .container {
+  overflow: hidden; /* Применяется к телу или основному контейнеру */
+}
+
+  
+  .pers-animate {
+    position: absolute;
+    left: 0px; /* начальная позиция вне экрана */
+    top: 90px;
+    z-index: 0;
+    width: 120px;
+    height: 80px;
+    animation: flySerpentine 10s linear infinite;
+}
+
+
+
+@keyframes flySerpentine {
+  0% {
+      transform: translateX(-50vw) translateY(10vh) scaleX(1); /* Начальная точка, нормальное изображение */
+  }
+  20% {
+      transform: translateX(110vw) translateY(10vh) scaleX(1); /* Перелет в правую часть экрана */
+  }
+  40% {
+      transform: translateX(110vw) translateY(35vh) scaleX(-1); /* Разворот и небольшое опускание */
+  }
+  60% {
+      transform: translateX(-100%) translateY(35vh) scaleX(-1); /* Перелет обратно в левую часть */
+  }
+  80% {
+      transform: translateX(-100%) translateY(70vh) scaleX(1); /* Разворот и снова опускание */
+  }
+  100% {
+      transform: translateX(100vw) translateY(70vh) scaleX(1); /* Перелет в правую часть экрана */
+  }
+}
+  
+  .container {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  @keyframes animateErrorProgress {
+    100% {
+      background-size: 100% 100%;
+    }
+  }
+  
+  .top-content {
+    margin-top: -530px;  
+  }
+  
+  .name-bot {
+    display: flex;
+    justify-content: center;
+    font-size: 15px;
+    font-weight: 900;
+  }
+  
+  .print-signal {
+    font-family: 'Intro';
+    margin-bottom: 70px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 217px;
+    height: 217px;
+    background-color: #151027;
+    border: 5px solid #B41313;
+    border-radius: 50%;
+    font-size: 50px;
+    font-weight: 900;
+    transition: all .5s;
+    z-index: 2;
+  }
+  .print-signal span {
+    text-transform: uppercase;
+    font-size: 50px;
+    text-align: center;
+  }
+  .print-signal-button {
+    font-family: 'Intro';
+    color: #fff;
+    position: absolute;
+    margin-bottom: 70px;
+    display: flex; /* Добавлено для Flexbox */
+    justify-content: center; /* Центровка по горизонтали */
+    align-items: center; /* Центровка по вертикали */
+    width: 217px;
+    height: 217px;
+    background-color: #151027;
+    border: 5px solid #B41313;
+    border-radius: 50%;
+    font-size: 40px;
+    font-weight: 900;
+    z-index: 10;
+}
+.print-signal-button :hover{
+  scale: 0.9;
+  box-shadow: 0px 1px 2px rgba(255, 0, 0, 0.05);
+  border-radius: 30px;
+}
+
+.print-signal-button span {
+    text-transform: uppercase;
+    font-size: 33px;
+    text-align: center;
+}
+  
+  .stop-signal-time {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 13px;
+    width: 230px;
+    transition: all .5s;
+  }
+  
+  .stop-timer {
+    font-family: 'Intro';
+    font-size: 20px;
+    font-weight: 900;
+    height: 30px;
+  }
+  
+  .stop-progress {
+    width: 221px;
+    height: 18px;
+    background: linear-gradient(90deg, #FF0303 0%, #B4B4B4 100%) left /0% 100% no-repeat #D9D9D9;
+    border-radius: 15px;
+  }
+  
+  @keyframes animateProgress {
+    100% {
+      background-size: 100% 100%;
+    }
+  }
+  
+  .button-game {
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+  }
+  
+  .get-signal {
+    font-family: 'Intro';
+    position: relative;
+    width: 278px;
+    height: 56px;
+    border: none;
+    background: linear-gradient(90deg, #FF0303 0%, #B4B4B4 100%); box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.05);
+    box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.05);
+    border-radius: 30px;
+    color: #ffffff;
+    font-size: 24px;
+    font-weight: 900;
+    cursor: pointer;
+    transition: all .2s;
+    z-index: 0;
+  }
+  
+  .get-signal-two {
+    font-family: 'Intro';
+    position: absolute;
+    width: 278px;
+    height: 56px;
+    border: none;
+    box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.05);
+    border-radius: 30px;
+    background: linear-gradient(90deg, #FF0303 0%, #B4B4B4 100%); box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.05);
+    color: #ffffff;
+    font-size: 24px;
+    font-weight: 900;
+    cursor: pointer;
+    z-index: -1;
+    transition: all .2s;
+  }
+  
+  .game-here {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 auto;
+    width: 130px;
+    height: 35px;
+    background: linear-gradient(90deg, #FE6060 0%, #828885 100%);
+    box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.05);
+    box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.05);
+    border-radius: 30px;
+    color: #ffffff;
+    font-size: 16px;
+    font-weight: 900;
+    text-decoration: none;
+    transition: all .2s;
+    z-index: 4;
+  }
+
+  .tab {
+    position: fixed;
+    bottom: 0;
+    z-index: 10;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    background-color: #333;
+    padding: 10px 0;
+    border-radius: 50px;
+    height: 70px; /* Фиксированная высота для десктопа */
+}
+
+.tab button {
+    background-color: inherit;
+    flex: 1 0 auto;
+    margin: 0 10px;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    padding: 14px 20px;
+    transition: 0.3s;
+    color: #fff;
+    text-align: center;
+    border-radius: 50px;
+    font-size: 16px;
+    font-family: 'Intro', Arial, sans-serif;
+}
+
+.tab button img {
+    max-width: 38px;
+    height: 38px;
+}
+
+.tab button:hover {
+    background-color: #555;
+    transform: translateY(-2px);
+}
+
+.tab button.active {
+    background-color: #666;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+}
+
+/* Медиазапросы для адаптации на мобильных устройствах */
+@media (max-width: 768px) {
+    .tab {
+        height: 70px; /* Фиксированная высота для планшетов */
+    }
+
+    .tab button {
+        margin: 0 5px;
+        padding: 10px 15px;
+        font-size: 14px;
+    }
+
+    .tab button img {
+        max-width: 32px;
+        height: 32px;
+    }
+}
+
+@media (max-width: 480px) {
+    .tab {
+        height: 70px; /* Фиксированная высота для мобильных устройств */
+    }
+
+
+    .tab button {
+        margin: 0 3px;
+        padding: 8px 12px;
+        font-size: 12px;
+    }
+
+    .tab button img {
+        max-width: 28px;
+        height: 28px;
+    }
+}
+  
+  .get-signal::before, .game-here::before, .get-signal-two::before{
+    content: "";
+    position: absolute;
+    inset: 0px;
+    z-index: -1;
+    background: linear-gradient(90deg, #FF0303 0%, #B4B4B4 100%); box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.05);
+    filter: blur(10px);
+    border-radius: 30px;
+  }
+  
+  .print-signal-button:active, .game-here:active, .get-signal-two:active{
+    transform: scale(90%);
+  }
+  
+  .deactivate {
+    opacity: 0;
+  }
+  
