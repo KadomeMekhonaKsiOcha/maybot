@@ -1,0 +1,1188 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Signal Portal</title>
+    <style>
+        @font-face {
+            font-family: 'Intro';
+            src: url('intro.otf') format('opentype');
+        }
+        *, *::before, *::after { box-sizing: border-box; }
+        html, body { margin: 0; padding: 0; min-height: 100%; }
+
+        body {
+            background: #0C0E1F;
+            color: #F0F2FF;
+            font-family: 'Intro', Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            padding-bottom: 68px;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+            -webkit-touch-callout: none;
+            overflow-x: hidden;
+        }
+
+        /* ── Stars ── */
+        .stars { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; }
+        .star { position: absolute; background: #8899cc; border-radius: 50%; animation: twinkle 2s infinite alternate; }
+        @keyframes twinkle { from { opacity: 0.05; } to { opacity: 0.45; } }
+        canvas#particleCanvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
+
+        /* ── Loader ── */
+        #loader {
+            position: fixed; inset: 0; background: #080917;
+            display: flex; flex-direction: column;
+            justify-content: center; align-items: center;
+            z-index: 2000; gap: 16px;
+        }
+        #loader .spinner {
+            border: 5px solid rgba(255,255,255,0.07);
+            border-top: 5px solid #FFB800;
+            border-radius: 50%; width: 50px; height: 50px;
+            animation: spin 0.85s linear infinite;
+        }
+        #loader p { color: rgba(255,255,255,0.35); font-size: 12px; margin: 0; font-family: Arial, sans-serif; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* ── User header card ── */
+        .user-header-card {
+            position: relative; z-index: 10;
+            background: #141729;
+            border: 1px solid rgba(255,255,255,0.07);
+            border-radius: 22px;
+            margin: 10px 12px 0;
+            padding: 12px 14px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-shrink: 0;
+        }
+        .user-info-group { display: flex; align-items: center; gap: 10px; }
+        .user-avatar-wrap {
+            width: 44px; height: 44px;
+            border-radius: 50%;
+            background: linear-gradient(145deg, #3B82F6, #6D28D9);
+            display: flex; align-items: center; justify-content: center;
+            position: relative; flex-shrink: 0;
+        }
+        .user-avatar-wrap::after {
+            content: '';
+            position: absolute; bottom: 1px; right: 1px;
+            width: 11px; height: 11px;
+            border-radius: 50%;
+            background: #2ECC71;
+            border: 2.5px solid #141729;
+        }
+        .user-avatar-icon { width: 24px; height: 24px; opacity: 0.95; }
+        .user-text { display: flex; flex-direction: column; gap: 2px; }
+        .user-display-name {
+            font-size: 14px; font-weight: bold;
+            font-family: 'Intro', Arial, sans-serif;
+            background: linear-gradient(120deg, #C084FC, #A78BFA);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+            line-height: 1.1;
+        }
+        .user-display-id {
+            font-size: 11px; color: rgba(255,255,255,0.38);
+            font-family: Arial, sans-serif; letter-spacing: 0.3px;
+        }
+        .header-actions { display: flex; align-items: center; gap: 8px; }
+        .tg-action-btn {
+            width: 38px; height: 38px; border-radius: 50%;
+            background: rgba(255,255,255,0.07);
+            border: 1px solid rgba(255,255,255,0.09);
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; color: rgba(255,255,255,0.65);
+            -webkit-tap-highlight-color: transparent;
+            transition: background 0.15s;
+        }
+        .tg-action-btn:active { background: rgba(255,255,255,0.12); }
+        .search-action-btn {
+            width: 38px; height: 38px; border-radius: 50%;
+            background: rgba(255,255,255,0.07);
+            border: 1px solid rgba(255,255,255,0.09);
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; color: rgba(255,255,255,0.65);
+            -webkit-tap-highlight-color: transparent;
+            transition: background 0.15s, color 0.15s;
+        }
+        .search-action-btn:active, .search-action-btn.active {
+            background: rgba(255,184,0,0.14); color: #FFB800;
+            border-color: rgba(255,184,0,0.3);
+        }
+        .lang-flag-wrap {
+            width: 38px; height: 28px; border-radius: 8px;
+            overflow: hidden; cursor: pointer;
+            border: 1px solid rgba(255,255,255,0.13);
+            flex-shrink: 0;
+        }
+        .lang-flag-wrap img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+        /* ── Language dropdown ── */
+        .lang-dropdown {
+            position: fixed; top: 72px; right: 12px;
+            z-index: 100;
+            background: #1a1e38;
+            border: 1px solid rgba(255,255,255,0.10);
+            border-radius: 16px; padding: 8px;
+            display: none; flex-direction: column; gap: 4px;
+            box-shadow: 0 8px 28px rgba(0,0,0,0.6);
+            min-width: 140px;
+        }
+        .lang-dropdown.open { display: flex; }
+        .lang-dd-item {
+            display: flex; align-items: center; gap: 10px;
+            padding: 8px 10px; border-radius: 10px; cursor: pointer;
+            transition: background 0.14s; -webkit-tap-highlight-color: transparent;
+        }
+        .lang-dd-item:active { background: rgba(255,255,255,0.07); }
+        .lang-dd-item img { width: 30px; height: 22px; border-radius: 4px; object-fit: cover; }
+        .lang-dd-item span { font-size: 13px; color: rgba(255,255,255,0.75); font-family: Arial, sans-serif; }
+
+        /* ── Search bar ── */
+        .search-bar {
+            position: relative; z-index: 9;
+            margin: 8px 12px 0;
+            display: none; align-items: center; gap: 8px;
+        }
+        .search-bar.open { display: flex; }
+        .search-bar input {
+            flex: 1;
+            background: #141729;
+            border: 1px solid rgba(255,255,255,0.10);
+            border-radius: 14px;
+            padding: 10px 14px;
+            color: #F0F2FF; font-size: 14px;
+            font-family: Arial, sans-serif; outline: none; height: 42px;
+        }
+        .search-bar input::placeholder { color: rgba(255,255,255,0.28); }
+        .search-clear-btn {
+            width: 38px; height: 38px; border-radius: 50%;
+            background: #141729; border: 1px solid rgba(255,255,255,0.10);
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; color: rgba(255,255,255,0.5); font-size: 16px;
+            flex-shrink: 0; -webkit-tap-highlight-color: transparent;
+        }
+
+        /* ── Tab content ── */
+        .tabcontent { display: none; flex-direction: column; flex-grow: 1; position: relative; z-index: 1; }
+        .tabcontent.active { display: flex; }
+
+        /* ── Online counter ── */
+        .online-bar {
+            position: relative; z-index: 9;
+            display: flex; align-items: center; justify-content: center;
+            gap: 6px;
+            padding: 5px 0 0;
+            font-family: Arial, sans-serif;
+        }
+        .online-dot {
+            width: 7px; height: 7px;
+            border-radius: 50%;
+            background: #2ECC71;
+            box-shadow: 0 0 6px rgba(46,204,113,0.8);
+            animation: dotPulse 2s ease-in-out infinite;
+            flex-shrink: 0;
+        }
+        @keyframes dotPulse {
+            0%, 100% { box-shadow: 0 0 5px rgba(46,204,113,0.7); }
+            50%       { box-shadow: 0 0 12px rgba(46,204,113,1); }
+        }
+        .online-text {
+            font-size: 12px;
+            color: rgba(255,255,255,0.38);
+            letter-spacing: 0.2px;
+        }
+        .online-text b {
+            color: #2ECC71;
+            font-weight: 700;
+        }
+        .online-count-wrap {
+            display: inline-block;
+            transition: opacity 0.25s;
+        }
+
+        /* ── Filter bar ── */
+        .filter-bar {
+            display: flex; align-items: center; gap: 8px;
+            padding: 10px 12px 6px;
+            overflow-x: auto; scrollbar-width: none; flex-shrink: 0;
+            position: sticky; top: 0; z-index: 8;
+            background: #0C0E1F;
+        }
+        .filter-bar::-webkit-scrollbar { display: none; }
+        .filter-pill {
+            background: #141729;
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 20px; padding: 7px 16px;
+            font-size: 11px; font-weight: bold;
+            font-family: 'Intro', Arial, sans-serif;
+            color: rgba(255,255,255,0.45);
+            cursor: pointer; white-space: nowrap; flex-shrink: 0;
+            transition: background 0.18s, color 0.18s, border-color 0.18s;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .filter-pill:active { transform: scale(0.93); }
+        .filter-pill.active {
+            background: rgba(255,184,0,0.14);
+            border-color: rgba(255,184,0,0.5);
+            color: #FFB800;
+        }
+
+        /* ── Games container ── */
+        #Games { padding: 0 12px 8px; width: 100%; }
+
+        /* ── HERO CARD ── */
+        .hero-card {
+            width: 100%; height: 195px;
+            border-radius: 20px; overflow: hidden;
+            position: relative; background: #180A00;
+            margin-bottom: 10px; flex-shrink: 0;
+            -webkit-tap-highlight-color: transparent;
+            transition: transform 0.12s;
+        }
+        .hero-card:active { transform: scale(0.985); }
+        .hero-card .card-bg {
+            position: absolute; inset: 0;
+            width: 100%; height: 100%;
+            object-fit: cover;
+        }
+        .hero-card .card-gradient {
+            position: absolute; inset: 0;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.05) 25%, rgba(0,0,0,0.82) 100%);
+        }
+        .hero-bottom {
+            position: absolute; bottom: 0; left: 0; right: 0;
+            padding: 14px 16px 16px;
+            display: flex; flex-direction: column;
+            align-items: flex-start; gap: 10px; z-index: 2;
+        }
+        .hero-game-name {
+            font-family: 'Intro', Arial, sans-serif;
+            font-size: 20px; font-weight: bold; color: #fff;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.9);
+            letter-spacing: 0.5px; line-height: 1.15;
+        }
+        .hero-play-btn {
+            background: rgba(14, 16, 36, 0.80);
+            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.18);
+            border-radius: 18px; padding: 9px 22px;
+            color: #fff; font-size: 13px; font-weight: bold;
+            font-family: 'Intro', Arial, sans-serif;
+            cursor: pointer; -webkit-tap-highlight-color: transparent;
+            transition: opacity 0.12s;
+        }
+        .hero-play-btn:active { opacity: 0.72; }
+
+        /* ── 2-column game grid ── */
+        .row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px; width: 100%;
+        }
+
+        /* ── Game card ── */
+        .game {
+            position: relative;
+            border-radius: 20px; overflow: hidden;
+            background: #141729;
+            aspect-ratio: 9 / 11;
+            -webkit-tap-highlight-color: transparent;
+            transition: transform 0.12s;
+            display: block;
+        }
+        .game:active { transform: scale(0.955); }
+
+        .card-bg {
+            position: absolute; inset: 0;
+            width: 100%; height: calc(100% - 44px);
+            object-fit: contain;
+            padding: 14px 10px 4px;
+        }
+        .card-gradient {
+            position: absolute; inset: 0;
+            background: linear-gradient(to bottom,
+                transparent 35%,
+                rgba(8,10,26,0.85) 75%,
+                rgba(6,8,22,0.97) 100%);
+        }
+
+        .card-bottom {
+            position: absolute; bottom: 0; left: 0; right: 0;
+            padding: 10px 10px 12px;
+            display: flex; align-items: center;
+            justify-content: space-between; gap: 6px; z-index: 2;
+        }
+        .card-bottom h3 {
+            font-size: 12px; margin: 0;
+            color: rgba(240,242,255,0.92);
+            font-family: 'Intro', Arial, sans-serif;
+            font-weight: bold; letter-spacing: 0.2px;
+            line-height: 1.25; flex: 1;
+            text-shadow: 0 1px 4px rgba(0,0,0,0.8);
+        }
+        .play-btn {
+            background: rgba(12,14,32,0.82);
+            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.14);
+            border-radius: 14px; padding: 7px 12px;
+            color: rgba(255,255,255,0.88); font-size: 11px; font-weight: bold;
+            font-family: 'Intro', Arial, sans-serif;
+            cursor: pointer; white-space: nowrap; flex-shrink: 0;
+            -webkit-tap-highlight-color: transparent;
+            transition: opacity 0.12s;
+        }
+        .play-btn:active { opacity: 0.68; }
+
+        /* ── Card badge (NEW / HOT / TOP / FEATURED) ── */
+        .card-badge {
+            position: absolute; top: 10px; left: 10px; z-index: 3;
+            font-size: 9px; font-weight: bold;
+            font-family: Arial, sans-serif; letter-spacing: 1px;
+            padding: 4px 10px; border-radius: 20px; text-transform: uppercase;
+            pointer-events: none;
+        }
+        .card-badge.new, .card-badge.featured {
+            background: #27AE60; color: #fff;
+            box-shadow: 0 2px 8px rgba(39,174,96,0.45);
+        }
+        .card-badge.hot {
+            background: linear-gradient(135deg, #FF3A00, #FF7A00); color: #fff;
+            box-shadow: 0 2px 8px rgba(255,60,0,0.45);
+        }
+        .card-badge.top {
+            background: linear-gradient(135deg, #6B21A8, #A855F7); color: #fff;
+            box-shadow: 0 2px 8px rgba(168,85,247,0.4);
+        }
+
+        /* Hero badge */
+        .hero-badge {
+            position: absolute; top: 14px; left: 14px; z-index: 3;
+            font-size: 10px; font-weight: bold; font-family: Arial, sans-serif;
+            letter-spacing: 1px; padding: 5px 12px;
+            border-radius: 20px; text-transform: uppercase;
+            background: #27AE60; color: #fff;
+            box-shadow: 0 2px 10px rgba(39,174,96,0.5);
+        }
+
+        /* ── Favorite button ── */
+        .fav-btn {
+            position: absolute; top: 8px; right: 8px; z-index: 3;
+            width: 28px; height: 28px;
+            background: rgba(0,0,0,0.45);
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; font-size: 13px; color: rgba(255,255,255,0.4);
+            transition: color 0.2s, background 0.2s, border-color 0.2s;
+            -webkit-tap-highlight-color: transparent; line-height: 1;
+        }
+        .fav-btn:active { transform: scale(0.82); }
+        .fav-btn.favorited { color: #FF4466; background: rgba(255,68,102,0.15); border-color: rgba(255,68,102,0.35); }
+
+        /* ── No results ── */
+        .no-results {
+            grid-column: 1 / -1; text-align: center;
+            padding: 40px 20px; color: rgba(255,255,255,0.28);
+            font-size: 14px; font-family: Arial, sans-serif; display: none;
+        }
+        .no-results span { font-size: 34px; display: block; margin-bottom: 12px; }
+
+        /* ── Stagger animation ── */
+        @keyframes cardIn {
+            from { opacity: 0; transform: translateY(14px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ── Bottom tab bar ── */
+        .tab {
+            position: fixed; bottom: 0; left: 0; z-index: 30;
+            width: 100%; height: 64px;
+            display: flex; justify-content: center; align-items: center;
+            background: rgba(8,10,24,0.97);
+            backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+            border-top: 1px solid rgba(255,255,255,0.06);
+        }
+        .tab button {
+            background: transparent; border: none; outline: none; cursor: pointer;
+            padding: 8px 36px; border-radius: 14px;
+            -webkit-tap-highlight-color: transparent;
+            display: flex; flex-direction: column; align-items: center; position: relative;
+        }
+        .tab button:active { background: rgba(255,255,255,0.05); }
+        .tab button img { width: 28px; height: 28px; opacity: 0.5; transition: opacity 0.2s; }
+        .tab button.active img { opacity: 1; }
+        .tab button.active::after {
+            content: ''; position: absolute; bottom: 4px;
+            width: 5px; height: 5px; border-radius: 50%;
+            background: #FFB800; box-shadow: 0 0 6px rgba(255,184,0,0.8);
+        }
+
+        /* ── Contact tab ── */
+        #Contact { padding: 16px 16px; width: 100%; align-items: center; }
+        .title { font-size: 20px; font-weight: bold; color: #F0F2FF; letter-spacing: 2px; margin: 0 0 18px; text-align: center; text-transform: uppercase; }
+        .image-container { width: 100%; display: flex; flex-direction: column; align-items: center; }
+        .image-container img { margin-top: 12px; width: 160px; height: 120px; border-radius: 18px; object-fit: cover; box-shadow: 0 0 20px rgba(255,255,255,0.08); display: block; }
+        .device-info { margin: 12px 0; font-size: 14px; text-align: center; color: rgba(220,225,255,0.55); opacity: 0; transform: translateY(-10px); transition: opacity 0.5s, transform 0.5s; }
+        .device-info.visible { opacity: 1; transform: translateY(0); }
+        .detect-button, .start-button {
+            font-size: 14px; font-weight: bold; padding: 12px 24px; width: 220px;
+            border-radius: 22px; background: linear-gradient(145deg, #1745A0, #4B8FFF);
+            border: none; color: white; cursor: pointer; transition: opacity 0.18s; outline: none;
+            font-family: 'Intro', Arial, sans-serif; display: block; margin: 8px auto;
+            box-shadow: 0 4px 16px rgba(75,143,255,0.25); -webkit-tap-highlight-color: transparent;
+        }
+        .detect-button:active, .start-button:active { opacity: 0.74; }
+        .telegram-button {
+            display: flex; justify-content: center; align-items: center;
+            font-size: 13px; font-weight: bold; padding: 12px 20px; width: 240px;
+            border-radius: 22px; background: linear-gradient(145deg, #1745A0, #4B8FFF);
+            border: none; color: white; cursor: pointer; transition: opacity 0.18s; outline: none;
+            font-family: 'Intro', Arial, sans-serif; margin: 8px auto;
+            box-shadow: 0 4px 16px rgba(75,143,255,0.25); -webkit-tap-highlight-color: transparent;
+        }
+        .telegram-button:active { opacity: 0.74; }
+
+        /* ── Modals ── */
+        .modal { display: none; position: fixed; z-index: 1000; inset: 0; background: rgba(0,0,0,0.75); backdrop-filter: blur(6px); opacity: 0; visibility: hidden; transition: opacity 0.3s, visibility 0.3s; }
+        .modal.show { display: block; opacity: 1; visibility: visible; }
+        .modal-content { background: #141729; border: 1px solid rgba(255,255,255,0.09); margin: auto; padding: 24px; border-radius: 22px; width: 80%; max-width: 320px; position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); text-align: center; color: #F0F2FF; }
+        .modal-content h2 { font-size: 18px; margin: 0 0 16px; color: #F0F2FF; }
+        .close-button { position: absolute; top: 12px; right: 14px; background: transparent; border: none; font-size: 22px; cursor: pointer; color: rgba(255,255,255,0.35); }
+        .carousel { position: relative; width: 100%; }
+        .slides { display: flex; width: 100%; overflow: hidden; transition: transform 0.5s ease; }
+        .slide img { width: 50%; border-radius: 8px; }
+        .prev, .next { cursor: pointer; position: absolute; top: 50%; transform: translateY(-50%); padding: 10px 14px; color: #fff; font-size: 18px; background: rgba(0,0,0,0.5); border-radius: 6px; user-select: none; }
+        .prev { left: 0; } .next { right: 0; }
+        .dots-container { text-align: center; padding: 10px; }
+        .dot { cursor: pointer; width: 9px; height: 9px; margin: 0 3px; background: rgba(255,255,255,0.2); border-radius: 50%; display: inline-block; transition: background 0.3s; }
+        .dot.active, .dot:hover { background: #FFB800; }
+        .modal-mini { position: fixed; z-index: 1000; inset: 0; background: rgba(0,0,0,0.65); backdrop-filter: blur(6px); display: none; align-items: center; justify-content: center; }
+        .modal-content-mini { background: #141729; border: 1px solid rgba(255,255,255,0.09); padding: 24px; border-radius: 18px; width: 80%; max-width: 320px; text-align: center; position: relative; color: #F0F2FF; }
+        .close-button-mini { position: absolute; top: 10px; right: 12px; border: none; background: none; font-size: 22px; cursor: pointer; color: rgba(255,255,255,0.35); }
+        .loader { border: 8px solid rgba(255,255,255,0.07); border-top: 8px solid #4B8FFF; border-radius: 50%; width: 70px; height: 70px; animation: spin 1.1s linear infinite; margin: 20px auto; }
+
+        @media (max-width: 380px) {
+            .card-bottom h3 { font-size: 11px; }
+            .play-btn { font-size: 10px; padding: 6px 10px; }
+            .hero-game-name { font-size: 18px; }
+            .hero-card { height: 170px; }
+        }
+        @media (max-width: 340px) {
+            .card-bottom h3 { font-size: 10px; }
+            .play-btn { font-size: 9px; padding: 5px 8px; }
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="particleCanvas"></canvas>
+    <div class="stars" id="stars"></div>
+
+    <div id="loader">
+        <div class="spinner"></div>
+        <p>Licensed Telegram bot: @signal_tj_bot</p>
+    </div>
+
+    <!-- User header card -->
+    <div class="user-header-card">
+        <div class="user-info-group">
+            <div class="user-avatar-wrap">
+                <svg class="user-avatar-icon" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round">
+                    <circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+                </svg>
+            </div>
+            <div class="user-text">
+                <span class="user-display-name" id="user-display-name">Web User</span>
+                <span class="user-display-id" id="user-display-id">ID: demo-user</span>
+            </div>
+        </div>
+        <div class="header-actions">
+            <button class="search-action-btn" id="search-btn" onclick="toggleSearch()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+                    <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                </svg>
+            </button>
+            <button class="tg-action-btn" onclick="openTelegram()">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
+                </svg>
+            </button>
+            <div class="lang-flag-wrap" id="lang-flag-wrap" onclick="toggleLangDropdown()">
+                <img id="current-lang-flag" src="ru.png" alt="Lang">
+            </div>
+        </div>
+    </div>
+
+    <!-- Language dropdown -->
+    <div class="lang-dropdown" id="lang-dropdown">
+        <div class="lang-dd-item" onclick="selectLang('ru','ru.png','Русский')">
+            <img src="ru.png" alt="RU"><span>Русский</span>
+        </div>
+        <div class="lang-dd-item" onclick="selectLang('en','en.png','English')">
+            <img src="en.png" alt="EN"><span>English</span>
+        </div>
+        <div class="lang-dd-item" onclick="selectLang('hi','in.png','हिंदी')">
+            <img src="in.png" alt="HI"><span>हिंदी</span>
+        </div>
+        <div class="lang-dd-item" onclick="selectLang('uz','uz.png','O\'zbek')">
+            <img src="uz.png" alt="UZ"><span>O'zbek</span>
+        </div>
+        <div class="lang-dd-item" onclick="selectLang('es','es.png','Español')">
+            <img src="es.png" alt="ES"><span>Español</span>
+        </div>
+    </div>
+
+    <!-- Online counter -->
+    <div class="online-bar">
+        <span class="online-dot"></span>
+        <span class="online-text"><span class="online-count-wrap"><b id="online-count">1 284</b></span> онлайн</span>
+    </div>
+
+    <!-- Search bar -->
+    <div class="search-bar" id="search-bar">
+        <input type="text" id="search-input" placeholder="Поиск игры..." oninput="applyFilters()">
+        <button class="search-clear-btn" onclick="clearSearch()">✕</button>
+    </div>
+
+    <!-- Contact tab -->
+    <div id="Contact" class="tabcontent">
+        <div class="image-container">
+            <h2 class="title" id="game-picker-title">GAME PICKER</h2>
+            <img src="secret.png" alt="Secret Image">
+        </div>
+        <p id="device-output" class="device-info">Device not detected</p>
+        <button onclick="detectDevice()" class="detect-button" id="detect-button">Detect device</button>
+        <button onclick="startGame()" class="start-button" id="start-button">Start</button>
+        <button id="telegram-button" class="telegram-button">Перейти в телеграм (RU)</button>
+        <button id="telegram-button2" class="telegram-button">Перейти в телеграм (EN)</button>
+        <div id="modal" class="modal">
+            <div class="modal-content">
+                <button class="close-button" onclick="closeModal()">&times;</button>
+                <h2>Instruction</h2>
+                <div class="carousel">
+                    <div class="slides" style="width:200%;transition:transform 0.5s ease;">
+                        <div class="slide" style="width:50%;float:left;"><img src="inst1.png" alt="1"></div>
+                        <div class="slide" style="width:50%;float:left;"><img src="inst2.png" alt="2"></div>
+                    </div>
+                    <a class="prev" onclick="plusSlides(-1)">&#10094;</a>
+                    <a class="next" onclick="plusSlides(1)">&#10095;</a>
+                    <div class="dots-container">
+                        <span class="dot" onclick="currentSlide(1)"></span>
+                        <span class="dot" onclick="currentSlide(2)"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="miniModal" class="modal-mini">
+            <div class="modal-content-mini">
+                <button class="close-button-mini" onclick="closeMiniModal()">&times;</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Games tab -->
+    <div id="Games" class="tabcontent active">
+
+        <!-- Filter pills -->
+        <div class="filter-bar">
+            <button class="filter-pill active" onclick="setFilter('all',this)">Все</button>
+            <button class="filter-pill" onclick="setFilter('mines',this)">Mines</button>
+            <button class="filter-pill" onclick="setFilter('crash',this)">Crash</button>
+            <button class="filter-pill" onclick="setFilter('sports',this)">Спорт</button>
+            <button class="filter-pill" onclick="setFilter('other',this)">Другие</button>
+            <button class="filter-pill" onclick="setFilter('fav',this)">♥ Избранное</button>
+        </div>
+
+        <!-- Hero: Chicken Road -->
+        <div class="hero-card" id="hero-chicken" data-category="other" data-name="chicken road">
+            <img class="card-bg" src="chicken-assets/Assets/illustration.png" alt="Chicken Road">
+            <div class="card-gradient"></div>
+            <span class="hero-badge">NEW</span>
+            <div class="hero-bottom">
+                <span class="hero-game-name">Chicken Road</span>
+                <button class="hero-play-btn" id="game18-button" onclick="openGame('chickenRoad')">Играть</button>
+            </div>
+            <span id="game18-title" style="display:none">Chicken Road</span>
+        </div>
+
+        <!-- Game grid -->
+        <div class="row" id="games-row">
+
+            <div class="game" data-category="mines" data-name="mines">
+                <img class="card-bg" src="1.png" alt="Mines">
+                <div class="card-gradient"></div>
+                <span class="card-badge hot">HOT</span>
+                <button class="fav-btn" data-key="mines" onclick="event.stopPropagation();toggleFav(this)">♡</button>
+                <div class="card-bottom">
+                    <h3 id="game1-title">Mines</h3>
+                    <button id="game1-button" class="play-btn" onclick="openGame('mines')">Играть</button>
+                </div>
+            </div>
+
+            <div class="game" data-category="crash" data-name="tower rush">
+                <img class="card-bg" src="towerrush/logo.jpg" alt="Tower Rush" style="object-fit:cover;padding:0;height:100%;">
+                <div class="card-gradient"></div>
+                <span class="card-badge new">NEW</span>
+                <button class="fav-btn" data-key="tower-rush" onclick="event.stopPropagation();toggleFav(this)">♡</button>
+                <div class="card-bottom">
+                    <h3 id="game19-title">Tower Rush</h3>
+                    <button id="game19-button" class="play-btn" onclick="openGame('towerRush')">Играть</button>
+                </div>
+            </div>
+
+            <div class="game" data-category="mines" data-name="new mines">
+                <img class="card-bg" src="14.png" alt="New Mines">
+                <div class="card-gradient"></div>
+                <span class="card-badge featured">FEATURED</span>
+                <button class="fav-btn" data-key="new-mines" onclick="event.stopPropagation();toggleFav(this)">♡</button>
+                <div class="card-bottom">
+                    <h3 id="game14-title">New Mines</h3>
+                    <button id="game14-button" class="play-btn" onclick="openGame('nmines')">Играть</button>
+                </div>
+            </div>
+
+            <div class="game" data-category="crash" data-name="lucky jet">
+                <img class="card-bg" src="3.png" alt="Lucky Jet">
+                <div class="card-gradient"></div>
+                <span class="card-badge hot">HOT</span>
+                <button class="fav-btn" data-key="lucky-jet" onclick="event.stopPropagation();toggleFav(this)">♡</button>
+                <div class="card-bottom">
+                    <h3 id="game3-title">Lucky Jet</h3>
+                    <button id="game3-button" class="play-btn" onclick="openGame('lucky')">Играть</button>
+                </div>
+            </div>
+
+            <div class="game" data-category="crash" data-name="crash">
+                <img class="card-bg" src="12.png" alt="Crash">
+                <div class="card-gradient"></div>
+                <span class="card-badge top">TOP</span>
+                <button class="fav-btn" data-key="crash" onclick="event.stopPropagation();toggleFav(this)">♡</button>
+                <div class="card-bottom">
+                    <h3 id="game12-title">Crash</h3>
+                    <button id="game12-button" class="play-btn" onclick="openGame('crash')">Играть</button>
+                </div>
+            </div>
+
+            <div class="game" data-category="mines" data-name="royal mines">
+                <img class="card-bg" src="2.png" alt="Royal Mines">
+                <div class="card-gradient"></div>
+                <button class="fav-btn" data-key="royal-mines" onclick="event.stopPropagation();toggleFav(this)">♡</button>
+                <div class="card-bottom">
+                    <h3 id="game2-title">Royal Mines</h3>
+                    <button id="game2-button" class="play-btn" onclick="openGame('royal')">Играть</button>
+                </div>
+            </div>
+
+            <div class="game" data-category="mines" data-name="bombucks">
+                <img class="card-bg" src="13.png" alt="Bombucks">
+                <div class="card-gradient"></div>
+                <button class="fav-btn" data-key="bombucks" onclick="event.stopPropagation();toggleFav(this)">♡</button>
+                <div class="card-bottom">
+                    <h3 id="game13-title">Bombucks</h3>
+                    <button id="game13-button" class="play-btn" onclick="openGame('bomb')">Играть</button>
+                </div>
+            </div>
+
+            <div class="game" data-category="crash" data-name="tropicana">
+                <img class="card-bg" src="11.png" alt="Tropicana">
+                <div class="card-gradient"></div>
+                <button class="fav-btn" data-key="tropicana" onclick="event.stopPropagation();toggleFav(this)">♡</button>
+                <div class="card-bottom">
+                    <h3 id="game11-title">Tropicana</h3>
+                    <button id="game11-button" class="play-btn" onclick="openGame('tropicana')">Играть</button>
+                </div>
+            </div>
+
+            <div class="game" data-category="crash" data-name="rocket queen">
+                <img class="card-bg" src="4.png" alt="Rocket Queen">
+                <div class="card-gradient"></div>
+                <button class="fav-btn" data-key="rocket-queen" onclick="event.stopPropagation();toggleFav(this)">♡</button>
+                <div class="card-bottom">
+                    <h3 id="game4-title">Rocket Queen</h3>
+                    <button id="game4-button" class="play-btn" onclick="openGame('queen')">Играть</button>
+                </div>
+            </div>
+
+            <div class="game" data-category="other" data-name="brawl pirates">
+                <img class="card-bg" src="5.png" alt="Brawl Pirates">
+                <div class="card-gradient"></div>
+                <button class="fav-btn" data-key="brawl-pirates" onclick="event.stopPropagation();toggleFav(this)">♡</button>
+                <div class="card-bottom">
+                    <h3 id="game5-title">Brawl Pirates</h3>
+                    <button id="game5-button" class="play-btn" onclick="openGame('brawlPirates')">Играть</button>
+                </div>
+            </div>
+
+            <div class="game" data-category="other" data-name="coinflip">
+                <img class="card-bg" src="6.png" alt="CoinFlip">
+                <div class="card-gradient"></div>
+                <button class="fav-btn" data-key="coinflip" onclick="event.stopPropagation();toggleFav(this)">♡</button>
+                <div class="card-bottom">
+                    <h3 id="game6-title">CoinFlip</h3>
+                    <button id="game6-button" class="play-btn" onclick="openGame('coin')">Играть</button>
+                </div>
+            </div>
+
+            <div class="game" data-category="sports" data-name="football x">
+                <img class="card-bg" src="7.png" alt="Football X">
+                <div class="card-gradient"></div>
+                <button class="fav-btn" data-key="football-x" onclick="event.stopPropagation();toggleFav(this)">♡</button>
+                <div class="card-bottom">
+                    <h3 id="game7-title">Football X</h3>
+                    <button id="game7-button" class="play-btn" onclick="openGame('footballX')">Играть</button>
+                </div>
+            </div>
+
+            <div class="game" data-category="sports" data-name="penalty shoot">
+                <img class="card-bg" src="8.png" alt="Penalty Shoot">
+                <div class="card-gradient"></div>
+                <button class="fav-btn" data-key="penalty-shoot" onclick="event.stopPropagation();toggleFav(this)">♡</button>
+                <div class="card-bottom">
+                    <h3 id="game8-title">Penalty Shoot</h3>
+                    <button id="game8-button" class="play-btn" onclick="openGame('penalty')">Играть</button>
+                </div>
+            </div>
+
+            <div class="game" data-category="mines" data-name="mi mines">
+                <img class="card-bg" src="9.png" alt="Mi Mines">
+                <div class="card-gradient"></div>
+                <span class="card-badge featured">FEATURED</span>
+                <button class="fav-btn" data-key="mi-mines" onclick="event.stopPropagation();toggleFav(this)">♡</button>
+                <div class="card-bottom">
+                    <h3 id="game9-title">Mi Mines</h3>
+                    <button id="game9-button" class="play-btn" onclick="openGame('mimines')">Играть</button>
+                </div>
+            </div>
+
+            <div class="game" data-category="crash" data-name="aviator">
+                <img class="card-bg" src="10.png" alt="Aviator">
+                <div class="card-gradient"></div>
+                <span class="card-badge top">TOP</span>
+                <button class="fav-btn" data-key="aviator" onclick="event.stopPropagation();toggleFav(this)">♡</button>
+                <div class="card-bottom">
+                    <h3 id="game10-title">Aviator</h3>
+                    <button id="game10-button" class="play-btn" onclick="openGame('aviator')">Играть</button>
+                </div>
+            </div>
+
+            <div class="game" data-category="crash" data-name="meta crash">
+                <img class="card-bg" src="15.png" alt="Meta Crash">
+                <div class="card-gradient"></div>
+                <button class="fav-btn" data-key="meta-crash" onclick="event.stopPropagation();toggleFav(this)">♡</button>
+                <div class="card-bottom">
+                    <h3 id="game15-title">Meta Crash</h3>
+                    <button id="game15-button" class="play-btn" onclick="openGame('meta')">Играть</button>
+                </div>
+            </div>
+
+            <div class="game" data-category="crash" data-name="balloon">
+                <img class="card-bg" src="16.jpg" alt="Balloon">
+                <div class="card-gradient"></div>
+                <span class="card-badge new">NEW</span>
+                <button class="fav-btn" data-key="balloon" onclick="event.stopPropagation();toggleFav(this)">♡</button>
+                <div class="card-bottom">
+                    <h3 id="game16-title">Balloon</h3>
+                    <button id="game16-button" class="play-btn" onclick="openGame('ball')">Играть</button>
+                </div>
+            </div>
+
+            <div class="game" data-category="sports" data-name="goal">
+                <img class="card-bg" src="17.jpg" alt="Goal">
+                <div class="card-gradient"></div>
+                <button class="fav-btn" data-key="goal" onclick="event.stopPropagation();toggleFav(this)">♡</button>
+                <div class="card-bottom">
+                    <h3 id="game17-title">Goal</h3>
+                    <button id="game17-button" class="play-btn" onclick="openGame('goal')">Играть</button>
+                </div>
+            </div>
+
+            <div class="no-results" id="no-results">
+                <span>🔍</span>Игры не найдены
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom tabs -->
+    <div class="tab">
+        <button class="tablinks games-icon" data-tab="Games" onclick="openTab(event,'Games',this)">
+            <img src="game.png" alt="Игры">
+        </button>
+        <button class="tablinks contact-icon" data-tab="Contact" onclick="openTab(event,'Contact',this)">
+            <img src="money.png" alt="Контакты">
+        </button>
+    </div>
+
+    <audio id="aboutAudio" src="gif.mp3"></audio>
+
+    <script>
+    // ── State ──
+    let currentFilter = 'all';
+    let favs = new Set(JSON.parse(localStorage.getItem('portal_favs') || '[]'));
+    let langDropOpen = false;
+
+    // ── Init ──
+    document.addEventListener('DOMContentLoaded', () => {
+        // Telegram user info
+        try {
+            const tg = window.Telegram?.WebApp;
+            const user = tg?.initDataUnsafe?.user;
+            if (user) {
+                const name = [user.first_name, user.last_name].filter(Boolean).join(' ');
+                if (name) document.getElementById('user-display-name').textContent = name;
+                if (user.id) document.getElementById('user-display-id').textContent = 'ID: ' + user.id;
+            }
+        } catch(e) {}
+
+        let gBtn = document.querySelector('.tablinks.games-icon');
+        openTab(new Event('click'), 'Games', gBtn);
+        showSlides(slideIndex);
+        initFavs();
+        initStagger();
+        updateGameCount();
+
+        // close dropdown on outside click
+        document.addEventListener('click', (e) => {
+            if (langDropOpen && !e.target.closest('#lang-dropdown') && !e.target.closest('#lang-flag-wrap')) {
+                closeLangDropdown();
+            }
+        });
+    });
+
+    // ── Translations ──
+    const translations = {
+        ru:  { gamePickerTitle:"ВЫБОР ИГР", detectButton:"Определить устройство", startButton:"Начать", b:"Открыть" },
+        en:  { gamePickerTitle:"GAME PICKER", detectButton:"Detect device", startButton:"Start", b:"Open" },
+        hi:  { gamePickerTitle:"गेम पिकर", detectButton:"डिवाइस का पता लगाएं", startButton:"शुरू करें", b:"खोलें" },
+        br:  { gamePickerTitle:"SELETOR DE JOGOS", detectButton:"Detectar dispositivo", startButton:"Iniciar", b:"Abrir" },
+        es:  { gamePickerTitle:"SELECCIONADOR", detectButton:"Detectar dispositivo", startButton:"Iniciar", b:"Abrir" },
+        uz:  { gamePickerTitle:"O'YIN TANLOVCHI", detectButton:"Qurilmani aniqlash", startButton:"Boshlash", b:"Ochish" },
+        az:  { gamePickerTitle:"OYUN SEÇİCİ", detectButton:"Cihazı aşkar et", startButton:"Başla", b:"Aç" },
+        tr:  { gamePickerTitle:"OYUN SEÇİCİ", detectButton:"Cihazı tespit et", startButton:"Başlat", b:"Aç" },
+        pt:  { gamePickerTitle:"ESCOLHEDOR", detectButton:"Detectar dispositivo", startButton:"Iniciar", b:"Abrir" },
+        ar:  { gamePickerTitle:"مُختار الألعاب", detectButton:"اكتشاف الجهاز", startButton:"ابدأ", b:"فتح" },
+    };
+    const gameNames = {
+        1:"Mines",2:"Royal Mines",3:"Lucky Jet",4:"Rocket Queen",5:"Brawl Pirates",
+        6:"CoinFlip",7:"Football X",8:"Penalty Shoot",9:"Mi Mines",10:"Aviator",
+        11:"Tropicana",12:"Crash",13:"Bombucks",14:"New Mines",15:"Meta Crash",
+        16:"Balloon",17:"Goal",18:"Chicken Road",19:"Tower Rush"
+    };
+    const telegramBtns = {
+        ru: ["Перейти в телеграм (RU)","Перейти в телеграм (EN)"],
+        en: ["Go to Telegram (RU)","Go to Telegram (EN)"],
+        hi: ["टेलीग्राम पर जाएं (RU)","टेलीग्राम पर जाएं (EN)"],
+        br: ["Ir para o Telegram (RU)","Ir para o Telegram (EN)"],
+        es: ["Ir a Telegram (RU)","Ir a Telegram (EN)"],
+        uz: ["Telegramga o'tish (RU)","Telegramga o'tish (EN)"],
+        az: ["Teleqrama keç (RU)","Teleqrama keç (EN)"],
+        tr: ["Telegrame git (RU)","Telegrame git (EN)"],
+        pt: ["Ir para o Telegram (RU)","Ir para o Telegram (EN)"],
+        ar: ["اذهب إلى Telegram (RU)","اذهب إلى Telegram (EN)"],
+    };
+
+    function changeLanguage(lang) {
+        const t = translations[lang]; if (!t) return;
+        document.getElementById('game-picker-title').innerText = t.gamePickerTitle;
+        document.getElementById('detect-button').innerText = t.detectButton;
+        document.getElementById('start-button').innerText  = t.startButton;
+        for (let i = 1; i <= 19; i++) {
+            const te = document.getElementById('game' + i + '-title');
+            const be = document.getElementById('game' + i + '-button');
+            if (te) te.innerText = gameNames[i];
+            if (be) be.innerText = t.b;
+        }
+        const tb = telegramBtns[lang] || telegramBtns.en;
+        document.getElementById('telegram-button').innerText  = tb[0];
+        document.getElementById('telegram-button2').innerText = tb[1];
+    }
+
+    // ── Language dropdown ──
+    function toggleLangDropdown() {
+        const dd = document.getElementById('lang-dropdown');
+        langDropOpen = !langDropOpen;
+        dd.classList.toggle('open', langDropOpen);
+    }
+    function closeLangDropdown() {
+        langDropOpen = false;
+        document.getElementById('lang-dropdown').classList.remove('open');
+    }
+    function selectLang(code, flagSrc, label) {
+        document.getElementById('current-lang-flag').src = flagSrc;
+        changeLanguage(code);
+        closeLangDropdown();
+    }
+
+    // ── Search ──
+    function toggleSearch() {
+        const bar = document.getElementById('search-bar');
+        const btn = document.getElementById('search-btn');
+        const isOpen = bar.classList.contains('open');
+        if (isOpen) {
+            bar.classList.remove('open');
+            btn.classList.remove('active');
+            document.getElementById('search-input').value = '';
+            applyFilters();
+        } else {
+            bar.classList.add('open');
+            btn.classList.add('active');
+            setTimeout(() => document.getElementById('search-input').focus(), 80);
+        }
+    }
+    function clearSearch() {
+        document.getElementById('search-input').value = '';
+        applyFilters();
+        document.getElementById('search-input').focus();
+    }
+
+    // ── Telegram ──
+    function openTelegram() {
+        window.open('https://t.me/signal_tj_bot', '_blank');
+    }
+
+    // ── Filter ──
+    function setFilter(cat, btn) {
+        currentFilter = cat;
+        document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
+        btn.classList.add('active');
+        applyFilters();
+    }
+
+    function applyFilters() {
+        const query = (document.getElementById('search-input')?.value || '').toLowerCase().trim();
+
+        // Hero card
+        const hero = document.getElementById('hero-chicken');
+        if (hero) {
+            const matchCat   = currentFilter === 'all' || currentFilter === 'other';
+            const matchSearch = !query || 'chicken road'.includes(query);
+            const isFav = favs.has('chicken-road');
+            const showFav = currentFilter !== 'fav' || isFav;
+            hero.style.display = (matchCat && matchSearch && showFav) ? '' : 'none';
+        }
+
+        // Grid cards
+        let visible = hero?.style.display !== 'none' ? 1 : 0;
+        document.querySelectorAll('#games-row .game').forEach(card => {
+            const cat  = card.dataset.category || '';
+            const name = card.dataset.name || '';
+            const key  = card.querySelector('.fav-btn')?.dataset.key;
+            const matchCat  = currentFilter === 'all' || cat === currentFilter || (currentFilter === 'fav' && favs.has(key));
+            const matchSearch = !query || name.includes(query);
+            if (matchCat && matchSearch) { card.style.display = ''; visible++; }
+            else                          card.style.display = 'none';
+        });
+
+        const noRes = document.getElementById('no-results');
+        if (noRes) noRes.style.display = visible === 0 ? 'block' : 'none';
+        updateGameCount(visible);
+    }
+
+    function updateGameCount(n) {
+        // count shown only when filter not 'all'
+        const el = document.getElementById('user-display-id');
+        if (!el) return;
+        // just keep user ID, don't overwrite
+    }
+
+    // ── Favorites ──
+    function initFavs() {
+        document.querySelectorAll('.fav-btn').forEach(btn => {
+            const isFav = favs.has(btn.dataset.key);
+            btn.classList.toggle('favorited', isFav);
+            btn.textContent = isFav ? '♥' : '♡';
+        });
+    }
+    function toggleFav(btn) {
+        const key = btn.dataset.key;
+        if (favs.has(key)) {
+            favs.delete(key);
+            btn.classList.remove('favorited');
+            btn.textContent = '♡';
+        } else {
+            favs.add(key);
+            btn.classList.add('favorited');
+            btn.textContent = '♥';
+            btn.style.transform = 'scale(1.45)';
+            setTimeout(() => { btn.style.transform = ''; }, 180);
+        }
+        localStorage.setItem('portal_favs', JSON.stringify([...favs]));
+        if (currentFilter === 'fav') applyFilters();
+    }
+
+    // ── Stagger animation ──
+    function initStagger() {
+        const hero = document.getElementById('hero-chicken');
+        if (hero) {
+            hero.style.opacity = '0';
+            setTimeout(() => { hero.style.transition = 'opacity 0.4s ease'; hero.style.opacity = '1'; }, 120);
+        }
+        document.querySelectorAll('#games-row .game').forEach((card, i) => {
+            card.style.opacity = '0';
+            setTimeout(() => {
+                card.style.transition = 'opacity 0.38s ease, transform 0.38s ease';
+                card.style.opacity = '1';
+            }, 180 + i * 50);
+        });
+    }
+
+    // ── Fake online counter ──
+    (function() {
+        const el = document.getElementById('online-count');
+        let count = Math.floor(Math.random() * 300) + 1100;
+
+        function fmt(n) {
+            return n.toLocaleString('ru-RU').replace(',', ' ');
+        }
+        el.textContent = fmt(count);
+
+        setInterval(() => {
+            const big   = Math.random() < 0.12;
+            const delta = big
+                ? Math.floor(Math.random() * 18) + 8
+                : Math.floor(Math.random() * 6) + 1;
+            const dir = Math.random() < 0.52 ? 1 : -1;
+            count = Math.min(1800, Math.max(900, count + dir * delta));
+
+            const wrap = el.parentElement;
+            wrap.style.opacity = '0';
+            setTimeout(() => {
+                el.textContent = fmt(count);
+                wrap.style.opacity = '1';
+            }, 250);
+        }, Math.random() * 2000 + 2500);
+    })();
+
+    // ── Card click delegation (whole card → openGame) ──
+    document.getElementById('games-row').addEventListener('click', function(e) {
+        if (e.target.closest('.fav-btn')) return;
+        const card = e.target.closest('.game');
+        if (!card) return;
+        const btn = card.querySelector('.play-btn');
+        if (btn) btn.click();
+    });
+    document.getElementById('hero-chicken').addEventListener('click', function(e) {
+        const btn = document.getElementById('game18-button');
+        if (btn) btn.click();
+    });
+
+    // ── Stars ──
+    function createStars() {
+        const stars = document.getElementById('stars');
+        for (let i = 0; i < 200; i++) {
+            const s = document.createElement('div');
+            s.className = 'star';
+            const size = Math.random() * 1.8 + 0.3;
+            s.style.cssText = `left:${Math.random()*100}%;top:${Math.random()*100}%;width:${size}px;height:${size}px;animation-delay:${Math.random()*3}s;animation-duration:${Math.random()*2+1.5}s;`;
+            stars.appendChild(s);
+        }
+    }
+    createStars();
+
+    // ── Particles ──
+    const canvas = document.getElementById('particleCanvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+    let particles = [];
+    class P { constructor(){ this.x=Math.random()*canvas.width; this.y=Math.random()*canvas.height; this.size=Math.random()*1.8+0.3; this.sx=Math.random()*0.8-0.4; this.sy=Math.random()*0.8-0.4; } update(){ this.x+=this.sx; this.y+=this.sy; if(this.size>0.15)this.size-=0.025; } draw(){ ctx.fillStyle='rgba(140,170,255,0.35)'; ctx.beginPath(); ctx.arc(this.x,this.y,this.size,0,Math.PI*2); ctx.fill(); } }
+    for(let i=0;i<60;i++) particles.push(new P());
+    function anim(){ ctx.clearRect(0,0,canvas.width,canvas.height); particles.forEach((p,i)=>{ p.update(); p.draw(); if(p.size<=0.15){ particles.splice(i,1); particles.push(new P()); } }); requestAnimationFrame(anim); }
+    window.addEventListener('resize',()=>{ canvas.width=window.innerWidth; canvas.height=window.innerHeight; });
+    anim();
+
+    // ── Tabs ──
+    function openTab(evt, tabName, button) {
+        document.querySelectorAll('.tabcontent').forEach(t => { t.style.display='none'; t.classList.remove('active'); });
+        document.querySelectorAll('.tablinks').forEach(b => b.classList.remove('active'));
+        document.getElementById(tabName).style.display = 'flex';
+        document.getElementById(tabName).classList.add('active');
+        button.classList.add('active');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // ── Carousel ──
+    var slideIndex = 1;
+    function showSlides(n) {
+        var slides=document.getElementsByClassName("slide"), dots=document.getElementsByClassName("dot"), sc=document.querySelector(".slides");
+        if (!sc) return;
+        if(n>slides.length) slideIndex=1;
+        if(n<1) slideIndex=slides.length;
+        for(var i=0;i<dots.length;i++) dots[i].className=dots[i].className.replace(" active","");
+        sc.style.transform=`translateX(${-(slideIndex-1)*100/slides.length}%)`;
+        dots[slideIndex-1].className+=" active";
+    }
+    showSlides(slideIndex);
+    function plusSlides(n)   { showSlides(slideIndex+=n); }
+    function currentSlide(n) { showSlides(slideIndex=n); }
+
+    // ── Device ──
+    function detectDevice() {
+        var ua=navigator.userAgent, dt, dm='';
+        if(/android/i.test(ua)){dt='Android';var m=ua.match(/Android.*?; (\w+)\s(\w+)\s/);dm=m?m[1]+' '+m[2]:'';}
+        else if(/iPhone|iPad|iPod/i.test(ua)){dt='iOS';dm=/iPhone/i.test(ua)?'iPhone':/iPad/i.test(ua)?'iPad':'iPod';}
+        else dt='Desktop';
+        var out=document.getElementById("device-output");
+        out.classList.remove("visible");
+        setTimeout(()=>{out.textContent=dm?dt+' ('+dm+')':dt;out.classList.add("visible");},10);
+    }
+    function triggerHapticFeedback(){ if(navigator.vibrate) navigator.vibrate(100); }
+    function startGame(){
+        if(document.getElementById("device-output").textContent.trim()==="Device not detected"){showModal();return;}
+        const now=Date.now(),last=localStorage.getItem('lastGameTime');
+        if(last&&now-last<60000){var m=document.getElementById('miniModal');if(m)m.style.display='flex';return;}
+        var n=Math.floor(Math.random()*5)+1;localStorage.setItem('lastGameTime',now);
+        var ic=document.querySelector('.image-container'),img=ic.querySelector('img');
+        img.style.display='none';var ld=document.createElement('div');ld.className='loader';ic.appendChild(ld);
+        setTimeout(()=>{ld.remove();img.style.display='block';img.src=n+'.png';},3000);
+    }
+    function closeMiniModal(){document.getElementById('miniModal').style.display='none';}
+    function showModal(){var m=document.getElementById("modal");m.style.display='block';requestAnimationFrame(()=>m.classList.add("show"));}
+    function closeModal(){var m=document.getElementById("modal");m.classList.remove("show");setTimeout(()=>m.style.display='none',500);}
+
+    // ── Open game ──
+    function openGame(game) {
+        triggerHapticFeedback();
+        var isIOS=/iPhone|iPad|iPod/i.test(navigator.userAgent);
+        var links={
+            mines:{ios:'mines/index.html',other:'mines/index.html'},
+            nmines:{ios:'nmines/index.html',other:'nmines/index.html'},
+            royal:{ios:'royal/index.html',other:'royal/index.html'},
+            lucky:{ios:'jet/index.html',other:'jet/index.html'},
+            penalty:{ios:'penalty/index.html',other:'penalty/index.html'},
+            mimines:{ios:'mimines/index.html',other:'mimines/index.html'},
+            brawlPirates:{ios:'brawl/index.html',other:'brawl/index.html'},
+            aviator:{ios:'avi/index.html',other:'avi/index.html'},
+            footballX:{ios:'footx/index.html',other:'footx/index.html'},
+            coin:{ios:'coinios/index.html',other:'coinother/index.html'},
+            queen:{ios:'queen/index.html',other:'queen/index.html'},
+            tropicana:{ios:'trop/index.html',other:'trop/index.html'},
+            crash:{ios:'crash/index.html',other:'crash/index.html'},
+            bomb:{ios:'bomb/index.html',other:'bomb/index.html'},
+            ball:{ios:'ball/index.html',other:'ball/index.html'},
+            meta:{ios:'meta/index.html',other:'meta/index.html'},
+            goal:{ios:'goal/index.html',other:'goal/index.html'},
+            chickenRoad:{ios:'chicken/index.html',other:'chicken/index.html'},
+            towerRush:{ios:'towerrush/index.html',other:'towerrush/index.html'}
+        };
+        window.location.href=isIOS?links[game].ios:links[game].other;
+    }
+    </script>
+
+    <script>
+    window.addEventListener("load", () => {
+        const loader = document.getElementById("loader");
+        setTimeout(() => {
+            loader.style.transition = "opacity 0.7s ease";
+            loader.style.opacity = "0";
+            setTimeout(() => { loader.style.display = "none"; }, 700);
+        }, 2000);
+    });
+    </script>
+
+</body>
+</html>

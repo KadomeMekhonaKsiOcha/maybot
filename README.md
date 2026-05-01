@@ -1,1 +1,1 @@
-# maybot
+# bot

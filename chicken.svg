@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="50%" r="70%">
+      <stop offset="0%" stop-color="#1a0d00"/>
+      <stop offset="100%" stop-color="#090F1E"/>
+    </radialGradient>
+    <radialGradient id="glow" cx="50%" cy="55%" r="50%">
+      <stop offset="0%" stop-color="#FF6B00" stop-opacity="0.35"/>
+      <stop offset="100%" stop-color="#FF6B00" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="200" height="200" rx="28" fill="url(#bg)"/>
+  <rect width="200" height="200" rx="28" fill="url(#glow)"/>
+
+  <!-- Road (two orange lines) -->
+  <rect x="0" y="148" width="200" height="7" rx="0" fill="#FF6B00" opacity="0.7"/>
+  <rect x="0" y="160" width="200" height="7" rx="0" fill="#FF9500" opacity="0.45"/>
+
+  <!-- Dashed center line -->
+  <line x1="15" y1="154.5" x2="45" y2="154.5" stroke="#FFD700" stroke-width="2.5" stroke-dasharray="30,18"/>
+  <line x1="75" y1="154.5" x2="105" y2="154.5" stroke="#FFD700" stroke-width="2.5" stroke-dasharray="30,18"/>
+  <line x1="135" y1="154.5" x2="165" y2="154.5" stroke="#FFD700" stroke-width="2.5" stroke-dasharray="30,18"/>
+
+  <!-- Flames on road -->
+  <polygon points="35,148 43,120 51,148" fill="#FF4500" opacity="0.85"/>
+  <polygon points="39,148 43,126 47,148" fill="#FF8C00"/>
+  <polygon points="85,148 93,115 101,148" fill="#FF4500" opacity="0.85"/>
+  <polygon points="89,148 93,122 97,148" fill="#FF8C00"/>
+  <polygon points="135,148 143,120 151,148" fill="#FF4500" opacity="0.85"/>
+  <polygon points="139,148 143,126 147,148" fill="#FF8C00"/>
+
+  <!-- Chicken body -->
+  <ellipse cx="100" cy="98" rx="28" ry="24" fill="#FFB800"/>
+  <!-- Wing -->
+  <ellipse cx="80" cy="104" rx="14" ry="10" fill="#E8A000" transform="rotate(-20 80 104)"/>
+  <!-- Head -->
+  <circle cx="118" cy="78" r="18" fill="#FFD000"/>
+  <!-- Eye -->
+  <circle cx="123" cy="74" r="3.5" fill="#1a1a1a"/>
+  <circle cx="124.2" cy="73" r="1" fill="white"/>
+  <!-- Beak -->
+  <polygon points="133,78 144,82 133,86" fill="#FF6B00"/>
+  <!-- Comb -->
+  <polygon points="112,62 115,52 118,62 121,50 124,62 127,52 130,62" fill="#FF2200"/>
+  <!-- Wattle -->
+  <ellipse cx="132" cy="88" rx="5" ry="7" fill="#FF2200"/>
+  <!-- Legs -->
+  <line x1="90" y1="122" x2="82" y2="145" stroke="#FF9500" stroke-width="3.5" stroke-linecap="round"/>
+  <line x1="110" y1="122" x2="118" y2="145" stroke="#FF9500" stroke-width="3.5" stroke-linecap="round"/>
+  <!-- Feet -->
+  <line x1="82" y1="145" x2="72" y2="148" stroke="#FF9500" stroke-width="2.5" stroke-linecap="round"/>
+  <line x1="82" y1="145" x2="82" y2="150" stroke="#FF9500" stroke-width="2.5" stroke-linecap="round"/>
+  <line x1="118" y1="145" x2="128" y2="148" stroke="#FF9500" stroke-width="2.5" stroke-linecap="round"/>
+  <line x1="118" y1="145" x2="118" y2="150" stroke="#FF9500" stroke-width="2.5" stroke-linecap="round"/>
+
+  <!-- Label -->
+  <text x="100" y="185" text-anchor="middle" font-size="11.5" fill="#FF9500"
+        font-family="Arial, sans-serif" font-weight="bold" letter-spacing="1">CHICKEN ROAD</text>
+</svg>
