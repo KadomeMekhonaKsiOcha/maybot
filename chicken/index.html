@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>Chicken Road Signal</title>
+</head>
+<body>
+
+    <!-- Language selector -->
+    <div class="language-selector">
+        <img id="language-icon" src="../mines/flags/ru.png" alt="Language">
+        <div id="language-dropdown">
+            <img src="../mines/flags/ru.png" class="language-option" data-lang="ru">
+            <img src="../mines/flags/en.png" class="language-option" data-lang="en">
+            <img src="../mines/flags/hi.png" class="language-option" data-lang="hi">
+            <img src="../mines/flags/pt.png" class="language-option" data-lang="pt">
+            <img src="../mines/flags/es.png" class="language-option" data-lang="es">
+            <img src="../mines/flags/tr.png" class="language-option" data-lang="tr">
+        </div>
+    </div>
+
+    <!-- Logo -->
+    <div class="logo-wrap">
+        <img src="../chicken-assets/Assets/logo.png" alt="Chicken Road" class="logo-img">
+    </div>
+
+    <div class="container">
+
+        <!-- Target multiplier / status -->
+        <div id="status-wrap">
+            <div id="status">— —</div>
+            <div id="signal-accuracy">—</div>
+        </div>
+
+        <!-- Road: chicken + 7 oven tiles -->
+        <div id="road-outer">
+            <div id="road">
+                <div id="chicken-wrap">
+                    <img id="chicken-img" src="../chicken-assets/Assets/chicken.png" alt="chicken">
+                </div>
+                <div id="tiles"></div>
+            </div>
+        </div>
+
+        <!-- Difficulty selector -->
+        <div class="diff-row">
+            <button class="arr-btn" id="diff-prev">&#8249;</button>
+            <span id="diff-label">MEDIUM</span>
+            <button class="arr-btn" id="diff-next">&#8250;</button>
+        </div>
+
+        <!-- Signal button -->
+        <button id="flip">Получить сигнал</button>
+
+        <!-- Progress + countdown -->
+        <div id="progress-bar-container">
+            <div id="progress-bar"></div>
+        </div>
+        <div id="countdown">Осталось: 0 сек</div>
+
+    </div>
+
+    <!-- Back tab -->
+    <div class="tab">
+        <button onclick="window.location.href='../index.html'">
+            <img src="../mines/images/back.png" alt="Назад">
+        </button>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

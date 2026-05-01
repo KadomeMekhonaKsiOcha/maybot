@@ -1,0 +1,413 @@
+@font-face {
+    font-family: 'Intro';
+    src: url('../intro.otf') format('opentype');
+}
+
+/* ── Reset ── */
+html, body {
+    touch-action: none;
+    user-select: none;
+    -webkit-user-select: none;
+    margin: 0; padding: 0;
+    width: 100%; height: 100%;
+    overflow: hidden;
+    position: fixed;
+}
+
+body {
+    -webkit-text-size-adjust: 100%;
+    background-color: #13172B;
+    background-image: url('../chicken-assets/Background/Chicken\ Road.png');
+    background-size: cover;
+    background-position: center top;
+    color: #fff;
+    font-family: 'Intro', Arial, sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+/* Dark overlay so the background doesn't overpower the UI */
+body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: rgba(10, 12, 28, 0.72);
+    z-index: 0;
+}
+
+/* ── Logo ── */
+.logo-wrap {
+    position: relative;
+    z-index: 1;
+    margin-top: 96px;
+    margin-bottom: 0;
+}
+.logo-img {
+    height: 56px;
+    width: auto;
+    filter: drop-shadow(0 2px 8px rgba(0,0,0,0.6));
+}
+
+/* ── Main container ── */
+.container {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    max-width: 380px;
+    padding: 0 8px;
+    box-sizing: border-box;
+    margin-top: 10px;
+}
+
+/* ── Status / target multiplier ── */
+#status-wrap {
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+#status {
+    font-size: 30px;
+    font-weight: bold;
+    color: #FFD600;
+    text-shadow:
+        0 0 12px rgba(255, 214, 0, 0.7),
+        0 2px 4px rgba(0,0,0,0.8);
+    letter-spacing: 1px;
+    min-height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#signal-accuracy {
+    font-size: 13px;
+    color: #9DA5BF;
+    font-family: Arial, sans-serif;
+    margin-top: 2px;
+}
+
+/* ── Road outer wrapper ── */
+#road-outer {
+    width: 100%;
+    border-radius: 16px;
+    overflow: hidden;
+    border: 2px solid rgba(255,255,255,0.10);
+    background-image: url('../chicken-assets/Background/Chicken\ Road.png');
+    background-size: auto 240px;
+    background-position: 15% 100%;
+    box-shadow: 0 6px 28px rgba(0,0,0,0.6);
+}
+
+/* Inner road: dark overlay + flex row */
+#road {
+    display: flex;
+    align-items: center;
+    padding: 16px 10px 18px 8px;
+    gap: 6px;
+    background: rgba(8, 10, 26, 0.52);
+    backdrop-filter: blur(1px);
+    min-height: 100px;
+}
+
+/* ── Chicken ── */
+#chicken-wrap {
+    flex-shrink: 0;
+    width: 52px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+}
+#chicken-img {
+    width: 52px;
+    height: auto;
+    filter: drop-shadow(0 2px 8px rgba(0,0,0,0.7));
+    animation: chickenBob 2s ease-in-out infinite;
+}
+@keyframes chickenBob {
+    0%, 100% { transform: translateY(0); }
+    50%       { transform: translateY(-4px); }
+}
+#chicken-img.excited {
+    animation: chickenExcited 0.3s ease-in-out 4;
+}
+@keyframes chickenExcited {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    25%      { transform: translateY(-6px) rotate(-8deg); }
+    75%      { transform: translateY(-6px) rotate(8deg); }
+}
+
+/* ── Tiles container ── */
+#tiles {
+    display: flex;
+    flex: 1;
+    gap: 5px;
+    align-items: center;
+    justify-content: space-evenly;
+}
+
+/* Individual oven tile */
+.tile {
+    flex: 1;
+    min-width: 0;
+    aspect-ratio: 1;
+    max-width: 52px;
+    border-radius: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-family: Arial, sans-serif;
+    font-weight: 900;
+    font-size: 10.5px;
+    line-height: 1.15;
+    color: rgba(255,255,255,0.5);
+    border: 2.5px solid rgba(255,255,255,0.12);
+    background: radial-gradient(circle at 35% 35%, #2E3560, #1A1F3A);
+    box-shadow: inset 0 -2px 5px rgba(0,0,0,0.4);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Neutral — dimmed ring with step number */
+.tile .step-num {
+    font-size: 9px;
+    color: rgba(255,255,255,0.3);
+    font-weight: bold;
+}
+
+/* SAFE tile — green (like actual.png circle) */
+.tile.safe {
+    background: radial-gradient(circle at 35% 30%, #6FE57A, #27A348 60%, #1D7A36);
+    border-color: #4ECB71;
+    box-shadow:
+        inset 0 -3px 6px rgba(0,0,0,0.35),
+        0 0 12px rgba(78, 203, 113, 0.5);
+    color: #fff;
+    font-size: 10px;
+}
+.tile.safe .step-num { display: none; }
+
+/* CASHOUT tile — gold (like gold.png) */
+.tile.cashout {
+    background: radial-gradient(circle at 35% 30%, #FFE55C, #FFB800 60%, #C8850A);
+    border-color: #FFD600;
+    box-shadow:
+        inset 0 -3px 6px rgba(0,0,0,0.35),
+        0 0 18px rgba(255, 214, 0, 0.7);
+    color: #3D1F00;
+    font-size: 10px;
+    animation: cashoutPulse 1s ease-in-out infinite;
+}
+.tile.cashout .step-num { display: none; }
+@keyframes cashoutPulse {
+    0%, 100% { box-shadow: inset 0 -3px 6px rgba(0,0,0,0.35), 0 0 16px rgba(255,214,0,0.6); }
+    50%       { box-shadow: inset 0 -3px 6px rgba(0,0,0,0.35), 0 0 28px rgba(255,214,0,1); }
+}
+
+/* DANGER tile — fire (like fire.png) */
+.tile.danger {
+    background-image: url('../chicken-assets/Assets/fire.png');
+    background-size: 90% 90%;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-color: transparent;
+    border-color: rgba(200, 60, 80, 0.4);
+    box-shadow: 0 0 10px rgba(220, 50, 80, 0.35);
+    color: transparent;
+}
+.tile.danger .step-num { display: none; }
+
+/* Reveal pop animation */
+.tile.reveal {
+    animation: tilePop 0.38s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+@keyframes tilePop {
+    0%   { transform: scale(0.4); opacity: 0; }
+    100% { transform: scale(1);   opacity: 1; }
+}
+
+/* Cashout star icon overlay */
+.tile.cashout::after {
+    content: '★';
+    position: absolute;
+    top: 1px;
+    right: 2px;
+    font-size: 8px;
+    color: #3D1F00;
+    opacity: 0.7;
+}
+
+/* ── Difficulty selector ── */
+.diff-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 14px;
+}
+
+.arr-btn {
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.12);
+    color: #FFD600;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    font-size: 22px;
+    line-height: 1;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: Arial, sans-serif;
+    transition: background 0.2s;
+}
+.arr-btn:hover { background: rgba(255,214,0,0.15); }
+.arr-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+#diff-label {
+    font-size: 18px;
+    font-weight: bold;
+    color: #FFD600;
+    width: 96px;
+    text-align: center;
+    letter-spacing: 1px;
+    text-shadow: 0 0 10px rgba(255,214,0,0.5);
+}
+
+/* ── Signal button ── */
+#flip {
+    margin-top: 14px;
+    padding: 0 36px;
+    height: 46px;
+    background: linear-gradient(145deg, #E8920A, #FFB800);
+    border: none;
+    border-radius: 30px;
+    color: #3D1F00;
+    font-family: 'Intro', Arial, sans-serif;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 0 20px rgba(255,184,0,0.45), 0 4px 8px rgba(0,0,0,0.4);
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+#flip:disabled {
+    background: #333A55;
+    color: #666;
+    box-shadow: none;
+    cursor: not-allowed;
+}
+#flip:not(:disabled):active {
+    transform: scale(0.97);
+}
+
+/* ── Progress bar ── */
+#progress-bar-container {
+    width: 44%;
+    height: 5px;
+    background: rgba(255,255,255,0.1);
+    margin-top: 14px;
+    border-radius: 5px;
+    overflow: hidden;
+}
+#progress-bar {
+    width: 0%;
+    height: 100%;
+    background: linear-gradient(90deg, #E8920A, #FFD600);
+    transition: width 0.1s linear;
+}
+
+#countdown {
+    margin-top: 8px;
+    font-size: 13px;
+    color: #9DA5BF;
+    font-family: Arial, sans-serif;
+}
+
+/* ── Language selector ── */
+:root {
+    --lw: 2.4rem;
+    --lh: 1.65rem;
+}
+.language-selector {
+    position: absolute;
+    top: 105px;
+    right: 10px;
+    z-index: 10;
+}
+#language-icon {
+    width: var(--lw);
+    height: var(--lh);
+    cursor: pointer;
+    border-radius: 0.5rem;
+    background: #1f2639;
+    border: 1px solid #34405e;
+    padding: 0.3rem;
+    display: block;
+}
+#language-dropdown {
+    position: absolute;
+    top: 10px; right: 10px;
+    display: none;
+    grid-template-columns: repeat(2, calc(var(--lw) + 0.6rem));
+    grid-gap: 0.1rem;
+    background: #1f2639;
+    border: 1px solid #34405e;
+    border-radius: 0.5rem;
+    z-index: 10;
+}
+#language-dropdown img {
+    width: var(--lw);
+    height: var(--lh);
+    padding: 0.3rem;
+    cursor: pointer;
+    display: block;
+}
+
+/* ── Bottom tab ── */
+.tab {
+    position: fixed;
+    bottom: 0;
+    z-index: 10;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    background: #1E2235;
+    padding: 10px 0;
+    border-radius: 50px 50px 0 0;
+    height: 70px;
+    box-sizing: border-box;
+    border-top: 1px solid rgba(255,255,255,0.06);
+}
+.tab button {
+    background: transparent;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    padding: 8px 20px;
+    border-radius: 50px;
+    transition: background 0.2s;
+}
+.tab button:hover { background: rgba(255,255,255,0.07); }
+.tab button img { max-width: 36px; height: 36px; }
+
+@media (max-width: 380px) {
+    .logo-img  { height: 46px; }
+    #status    { font-size: 24px; }
+    .tile      { max-width: 44px; font-size: 9.5px; }
+    #chicken-img { width: 44px; }
+    #chicken-wrap { width: 44px; }
+    #road      { gap: 4px; padding: 14px 8px 16px 6px; }
+}
+
+@media (max-width: 340px) {
+    .tile      { max-width: 38px; font-size: 8.5px; }
+    #chicken-img { width: 38px; }
+    #chicken-wrap { width: 38px; }
+}
