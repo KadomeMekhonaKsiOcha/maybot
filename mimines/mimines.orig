@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Игра</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+        @font-face {
+            font-family: 'Intro';
+            src: url('/static/intro.otf') format('opentype');
+        }
+
+        /* Анимация фоновых частиц */
+        @keyframes particleAnimation {
+            0% { transform: translate(0, 0) rotate(0deg); }
+            25% { transform: translate(100px, -100px) rotate(90deg); }
+            50% { transform: translate(200px, 0) rotate(180deg); }
+            75% { transform: translate(100px, 100px) rotate(270deg); }
+            100% { transform: translate(0, 0) rotate(360deg); }
+        }
+
+        /* Анимация свечения */
+        @keyframes glow {
+            0% { box-shadow: 0 0 5px rgba(8, 117, 199, 0.5); }
+            50% { box-shadow: 0 0 20px rgba(8, 117, 199, 0.8); }
+            100% { box-shadow: 0 0 5px rgba(8, 117, 199, 0.5); }
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: radial-gradient(circle at center, #0875c7 0%, #0051ba 50%, #034a8a 100%);
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Добавляем анимированные частицы */
+        .particle {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Разные размеры для пузырьков */
+        .particle:nth-child(1) { width: 15px; height: 15px; animation: particleAnimation 20s infinite linear; top: 15%; left: 10%; }
+        .particle:nth-child(2) { width: 25px; height: 25px; animation: particleAnimation 25s infinite linear reverse; top: 25%; left: 85%; }
+        .particle:nth-child(3) { width: 10px; height: 10px; animation: particleAnimation 22s infinite linear; top: 85%; left: 15%; }
+        .particle:nth-child(4) { width: 20px; height: 20px; animation: particleAnimation 28s infinite linear reverse; top: 45%; left: 65%; }
+        .particle:nth-child(5) { width: 18px; height: 18px; animation: particleAnimation 24s infinite linear; top: 65%; left: 35%; }
+        .particle:nth-child(6) { width: 12px; height: 12px; animation: particleAnimation 26s infinite linear reverse; top: 35%; left: 75%; }
+        .particle:nth-child(7) { width: 22px; height: 22px; animation: particleAnimation 23s infinite linear; top: 75%; left: 25%; }
+        .particle:nth-child(8) { width: 16px; height: 16px; animation: particleAnimation 27s infinite linear reverse; top: 55%; left: 45%; }
+        .particle:nth-child(9) { width: 14px; height: 14px; animation: particleAnimation 21s infinite linear; top: 5%; left: 55%; }
+        .particle:nth-child(10) { width: 20px; height: 20px; animation: particleAnimation 29s infinite linear reverse; top: 95%; left: 5%; }
+
+        /* Дополнительная анимация для разнообразия движения */
+        @keyframes particleAnimation2 {
+            0% { transform: translate(0, 0) rotate(0deg) scale(1); }
+            25% { transform: translate(-100px, 100px) rotate(90deg) scale(1.1); }
+            50% { transform: translate(-200px, 0) rotate(180deg) scale(1); }
+            75% { transform: translate(-100px, -100px) rotate(270deg) scale(0.9); }
+            100% { transform: translate(0, 0) rotate(360deg) scale(1); }
+        }
+
+        /* Применяем вторую анимацию к некоторым пузырькам */
+        .particle:nth-child(3) { animation: particleAnimation2 22s infinite linear; }
+        .particle:nth-child(6) { animation: particleAnimation2 26s infinite linear reverse; }
+        .particle:nth-child(9) { animation: particleAnimation2 21s infinite linear; }
+
+        .container {
+            background: rgba(8, 117, 199, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            width: 90%;
+            max-width: 800px;
+            animation: glow 3s infinite;
+            z-index: 1;
+        }
+
+        /* Стили для карточек */
+        .rectangle {
+            transform-style: preserve-3d;
+            transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer;
+        }
+
+        .rectangle:hover {
+            transform: translateY(-5px);
+        }
+
+        .flipped {
+            transform: rotateY(180deg);
+        }
+
+        /* Обновленная анимация для звезды */
+        @keyframes starReveal {
+            0% {
+                transform: scale(0) rotate(-180deg);
+                opacity: 0;
+            }
+            50% {
+                transform: scale(1.2) rotate(20deg);
+            }
+            100% {
+                transform: scale(1) rotate(0);
+                opacity: 1;
+            }
+        }
+
+        .back img {
+            animation: starReveal 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        /* Удаляем стили для header и tab */
+        header, .tab {
+            display: none;
+        }
+
+        /* Новые стили для mines-oval */
+        .mines-oval {
+            background: rgba(9, 83, 144, 0.2);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 15px 30px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .mines-oval:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        label {
+            font-family: 'Intro', sans-serif;
+            font-size: 16px;
+            color: white;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin: 0;
+        }
+
+        select {
+            font-family: 'Intro', sans-serif;
+            font-size: 16px;
+            color: white;
+            background: rgba(9, 83, 144, 0.4);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 8px 35px 8px 15px;
+            cursor: pointer;
+            appearance: none;
+            transition: all 0.3s ease;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            background-size: 16px;
+        }
+
+        select:hover {
+            background-color: rgba(9, 83, 144, 0.6);
+            transform: translateY(-1px);
+        }
+
+        select:focus {
+            outline: none;
+            border-color: rgba(255, 255, 255, 0.3);
+            box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
+        }
+
+        /* Стили для опций в выпадающем списке */
+        select option {
+            background-color: #095390;
+            color: white;
+            padding: 10px;
+        }
+
+        /* Анимация для mines-oval */
+        @keyframes minesOvalGlow {
+            0% { box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1); }
+            50% { box-shadow: 0 8px 32px rgba(8, 117, 199, 0.2); }
+            100% { box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1); }
+        }
+
+        .mines-oval {
+            animation: minesOvalGlow 3s infinite;
+        }
+
+        .button-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            margin-top: 20px; /* Увеличиваем отступ сверху */
+        }
+
+        .restart-button {
+            width: 55px;
+            height: 55px;
+            background: linear-gradient(135deg, #0875c7, #0051ba);
+            border: none;
+            cursor: pointer;
+            padding: 0;
+            border-radius: 50%;
+            box-shadow: 0 4px 15px rgba(8, 117, 199, 0.3);
+            transition: all 0.3s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .restart-button:hover {
+            transform: translateY(-2px) rotate(15deg);
+            box-shadow: 0 6px 20px rgba(8, 117, 199, 0.4);
+        }
+
+        .restart-button img {
+            width: 65%;
+            height: 65%;
+            object-fit: contain;
+        }
+
+        .bet-button {
+            background: linear-gradient(135deg, #277100, #4f9000);
+            border: none;
+            padding: 15px 45px;
+            border-radius: 30px;
+            font-size: 20px;
+            font-weight: bold;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(39, 113, 0, 0.3);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-family: 'Intro', sans-serif;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .bet-button::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                to bottom right,
+                rgba(255, 255, 255, 0) 0%,
+                rgba(255, 255, 255, 0.13) 77%,
+                rgba(255, 255, 255, 0.5) 92%,
+                rgba(255, 255, 255, 0) 100%
+            );
+            transform: rotate(45deg);
+            animation: shine 3s infinite;
+        }
+
+        @keyframes shine {
+            0% {
+                left: -50%;
+                top: -50%;
+            }
+            100% {
+                left: 150%;
+                top: 150%;
+            }
+        }
+
+        .bet-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(39, 113, 0, 0.4);
+            background: linear-gradient(135deg, #2f8700, #5ba800);
+        }
+
+        .bet-button:active {
+            transform: translateY(1px);
+            box-shadow: 0 2px 10px rgba(39, 113, 0, 0.3);
+        }
+
+        header {
+            position: fixed;
+            top: 0;
+            z-index: 10;
+            width: 100%;
+            padding: 10px 20px;
+            background-color: #333;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            font-family: 'Intro', Arial, sans-serif;
+            box-sizing: border-box;
+            font-size: 24px;
+        }
+        header img {
+            height: 30px;
+            width: 30px;
+            margin-right: 10px;
+            border-radius: 50%;
+        }
+       .tab {
+            position: fixed;
+            bottom: 0;
+            z-index: 10;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            background-color: #333;
+            padding: 10px 0;
+            border-radius: 50px;
+            height: 70px; /* Фиксированная высота для десктопа */
+        }
+
+        .tab button {
+            background-color: inherit;
+            flex: 1 0 auto;
+            margin: 0 10px;
+            border: none;
+            outline: none;
+            cursor: pointer;
+            padding: 14px 20px;
+            transition: 0.3s;
+            color: #fff;
+            text-align: center;
+            border-radius: 50px;
+            font-size: 16px;
+            font-family: 'Intro', Arial, sans-serif;
+        }
+
+        .tab button img {
+            max-width: 38px;
+            height: 38px;
+        }
+
+        .tab button:hover {
+            background-color: #555;
+            transform: translateY(-2px);
+        }
+
+        .tab button.active {
+            background-color: #666;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Медиазапросы для адаптации на мобильных устройствах */
+        @media (max-width: 768px) {
+            .tab {
+                height: 70px; /* Фиксированная высота для планшетов */
+            }
+
+            .tab button {
+                margin: 0 5px;
+                padding: 10px 15px;
+                font-size: 14px;
+            }
+
+            .tab button img {
+                max-width: 32px;
+                height: 32px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .tab {
+                height: 70px; /* Фиксированная высота для мобильных устройств */
+            }
+
+
+            .tab button {
+                margin: 0 3px;
+                padding: 8px 12px;
+                font-size: 12px;
+            }
+
+            .tab button img {
+                max-width: 28px;
+                height: 28px;
+            }
+        }
+                /* Убираем синий эффект выделения при нажатии на мобильных устройствах */
+        button, select, input, textarea, a {
+            -webkit-tap-highlight-color: transparent;
+            -webkit-focus-ring-color: transparent;
+            outline: none;
+        }
+
+        * {
+            -webkit-tap-highlight-color: transparent; /* Убирает подсветку при нажатии на любом элементе */
+            -webkit-touch-callout: none; /* Отключает вызов меню на долгий тап */
+        }
+
+        .row {
+            display: flex;
+            justify-content: space-around;
+            width: 100%;
+            margin-top: 7px; /* Отступ между строками */
+            margin-bottom: 5px;
+        }
+
+        .rectangle {
+            position: relative;
+            width: calc(18% - 8px);
+            height: calc(20vw - 38px);
+            background-color: #0f3e6a;
+            border: 2px solid #034a8a;
+            box-shadow: 0 3px 0 #04306f,
+                        0 2px 3px rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+            cursor: pointer;
+        }
+
+        .front, .back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 8px;
+            -webkit-backface-visibility: hidden; /* Для Safari */
+        }
+
+        .back {
+            background-color: #085188;
+            transform: rotateY(180deg);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .back img {
+            width: 80%;
+            height: 80%;
+            object-fit: contain;
+        }
+
+        .flipped {
+            transform: rotateY(180deg);
+        }
+
+        /* Анимация для звезды */
+        @keyframes starPop {
+            0% {
+                transform: scale(0) rotate(-180deg);
+                opacity: 0;
+            }
+            100% {
+                transform: scale(1) rotate(0);
+                opacity: 1;
+            }
+        }
+
+        .back img {
+            animation: starPop 0.3s ease-out forwards;
+        }
+
+        .circle {
+            width: 45%; /* Размер круга */
+            height: 60%; /* Размер круга */
+            background: linear-gradient(to bottom, #1b4a90, #1e5395, #1e5b9c); /* Градиентный круг */
+            border-radius: 50%;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%); /* Центрирование круга */
+        }
+
+        /* Стили для стрелки возврата */
+        .back-arrow {
+            position: fixed;
+            top: 95px;
+            left: 20px;
+            z-index: 1000;
+            color: white;
+            cursor: pointer;
+            font-size: 32px;
+            display: flex;
+            align-items: center;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .back-arrow .material-icons {
+            font-size: 32px;
+        }
+
+    </style>
+</head>
+<body>
+    <!-- Добавляем стрелку сразу после открытия body -->
+    <div class="back-arrow" onclick="window.location.href='https://negociowin.ru/xxx/newnegocio'">
+        <span class="material-icons">arrow_back</span>
+    </div>
+
+    <!-- Добавляем больше частиц -->
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+
+    <!-- Удаляем header -->
+    <div class="mines-oval">
+        <label for="mines">Mines:</label>
+        <select id="mines">
+            <!-- Опции от 1 до 20 -->
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+            <option value="6">6</option>
+            <option value="7">7</option>
+            <option value="8">8</option>
+            <option value="9">9</option>
+            <option value="10">10</option>
+            <option value="11">11</option>
+            <option value="12">12</option>
+            <option value="13">13</option>
+            <option value="14">14</option>
+            <option value="15">15</option>
+            <option value="16">16</option>
+            <option value="17">17</option>
+            <option value="18">18</option>
+            <option value="19">19</option>
+            <option value="20">20</option>
+        </select>
+    </div>
+    <div class="container">
+        <!-- 5 строк по 5 прямоугольников -->
+        <div class="row">
+            <div class="rectangle">
+                <div class="front"><div class="circle"></div></div>
+                <div class="back"></div>
+            </div>
+            <div class="rectangle">
+                <div class="front"><div class="circle"></div></div>
+                <div class="back"></div>
+            </div>
+            <div class="rectangle">
+                <div class="front"><div class="circle"></div></div>
+                <div class="back"></div>
+            </div>
+            <div class="rectangle">
+                <div class="front"><div class="circle"></div></div>
+                <div class="back"></div>
+            </div>
+            <div class="rectangle">
+                <div class="front"><div class="circle"></div></div>
+                <div class="back"></div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="rectangle">
+                <div class="front"><div class="circle"></div></div>
+                <div class="back"></div>
+            </div>
+            <div class="rectangle">
+                <div class="front"><div class="circle"></div></div>
+                <div class="back"></div>
+            </div>
+            <div class="rectangle">
+                <div class="front"><div class="circle"></div></div>
+                <div class="back"></div>
+            </div>
+            <div class="rectangle">
+                <div class="front"><div class="circle"></div></div>
+                <div class="back"></div>
+            </div>
+            <div class="rectangle">
+                <div class="front"><div class="circle"></div></div>
+                <div class="back"></div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="rectangle">
+                <div class="front"><div class="circle"></div></div>
+                <div class="back"></div>
+            </div>
+            <div class="rectangle">
+                <div class="front"><div class="circle"></div></div>
+                <div class="back"></div>
+            </div>
+            <div class="rectangle">
+                <div class="front"><div class="circle"></div></div>
+                <div class="back"></div>
+            </div>
+            <div class="rectangle">
+                <div class="front"><div class="circle"></div></div>
+                <div class="back"></div>
+            </div>
+            <div class="rectangle">
+                <div class="front"><div class="circle"></div></div>
+                <div class="back"></div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="rectangle">
+                <div class="front"><div class="circle"></div></div>
+                <div class="back"></div>
+            </div>
+            <div class="rectangle">
+                <div class="front"><div class="circle"></div></div>
+                <div class="back"></div>
+            </div>
+            <div class="rectangle">
+                <div class="front"><div class="circle"></div></div>
+                <div class="back"></div>
+            </div>
+            <div class="rectangle">
+                <div class="front"><div class="circle"></div></div>
+                <div class="back"></div>
+            </div>
+            <div class="rectangle">
+                <div class="front"><div class="circle"></div></div>
+                <div class="back"></div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="rectangle">
+                <div class="front"><div class="circle"></div></div>
+                <div class="back"></div>
+            </div>
+            <div class="rectangle">
+                <div class="front"><div class="circle"></div></div>
+                <div class="back"></div>
+            </div>
+            <div class="rectangle">
+                <div class="front"><div class="circle"></div></div>
+                <div class="back"></div>
+            </div>
+            <div class="rectangle">
+                <div class="front"><div class="circle"></div></div>
+                <div class="back"></div>
+            </div>
+            <div class="rectangle">
+                <div class="front"><div class="circle"></div></div>
+                <div class="back"></div>
+            </div>
+        </div>
+    </div>
+    <div class="button-container">
+        <button class="restart-button">
+            <img src="/static/miminesrestart.png" alt="Restart" />
+        </button>
+        <button class="bet-button">Bet</button>
+    </div>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+<script>
+function triggerHapticFeedback() {
+    if (window.Telegram && window.Telegram.WebApp.HapticFeedback) {
+        window.Telegram.WebApp.HapticFeedback.impactOccurred('medium');
+    }
+}
+
+function resetRectangles() {
+    triggerHapticFeedback();
+    const rectangles = document.querySelectorAll('.rectangle');
+    rectangles.forEach((rectangle) => {
+        // Убираем класс flipped
+        rectangle.classList.remove('flipped');
+
+        // Сбрасываем заднюю сторону
+        const back = rectangle.querySelector('.back');
+        back.innerHTML = ''; // Очищаем заднюю сторону
+        back.style.background = '#085188';  // Возвращаем стандартный темно-синий фон
+        back.style.borderRadius = '8px';  // Закругленные углы
+        back.style.boxShadow = '0 3px 0 #04306f, 0 2px 3px rgba(0, 0, 0, 0.3)';  // Восстанавливаем исходные тени
+
+        // Восстанавливаем переднюю сторону с кругом
+        const front = rectangle.querySelector('.front');
+        front.innerHTML = ''; // Очищаем содержимое передней стороны
+        const circle = document.createElement('div');
+        circle.classList.add('circle'); // Добавляем круг заново
+        front.appendChild(circle);
+    });
+}
+
+function flipRectangles() {
+    triggerHapticFeedback();
+    const rectangles = document.querySelectorAll('.rectangle');
+    const minesCount = parseInt(document.getElementById('mines').value);
+    let starCount = 0;
+
+    // Устанавливаем количество звезд в зависимости от выбранного числа мин
+    switch (minesCount) {
+            case 1:
+                starCount = 10; // 1 ловушка = 10 звезд
+                break;
+            case 2:
+                starCount = 9; // 2 ловушки = 9 звезд
+                break;
+            case 3:
+                starCount = 8; // 3 ловушки = 8 звезд
+                break;
+            case 4:
+                starCount = 7; // 4 ловушки = 7 звезд
+                break;
+            case 5:
+                starCount = 6; // 5 ловушек = 6 звезд
+                break;
+            case 6:
+                starCount = 5; // 6 ловушек = 5 звезд
+                break;
+            case 7:
+                starCount = 4; // 7 ловушек = 4 звезды
+                break;
+            case 8:
+                starCount = 3; // 8 ловушек = 3 звезды
+                break;
+            case 9:
+                starCount = 3; // 9 ловушек = 3 звезды
+                break;
+            case 10:
+                starCount = 2; // 10 ловушек = 2 звезды
+                break;
+            case 11:
+                starCount = 2; // 11 ловушек = 2 звезды
+                break;
+            case 12:
+                starCount = 2; // 12 ловушек = 2 звезды
+                break;
+            case 13:
+                starCount = 1; // 13 ловушек = 1 звезда
+                break;
+            case 14:
+                starCount = 1; // 14 ловушек = 1 звезда
+                break;
+            case 15:
+                starCount = 1; // 15 ловушек = 1 звезда
+                break;
+            case 16:
+                starCount = 1; // 16 ловушек = 1 звезда
+                break;
+            case 17:
+                starCount = 1; // 17 ловушек = 1 звезда
+                break;
+            case 18:
+                starCount = 1; // 18 ловушек = 1 звезда
+                break;
+            case 19:
+                starCount = 1; // 19 ловушек = 1 звезда
+                break;
+            case 20:
+                starCount = 1; // 20 ловушек = 1 звезда
+                break;
+            default:
+                starCount = 0;
+        }
+
+    // Сбрасываем все ячейки перед выбором новых
+    rectangles.forEach((rectangle) => {
+        rectangle.classList.remove('flipped');
+        const back = rectangle.querySelector('.back');
+        back.innerHTML = '';
+        back.style.background = '#085188';
+    });
+
+    const starIndexes = new Set();
+
+    while (starIndexes.size < starCount) {
+        const randomIndex = Math.floor(Math.random() * rectangles.length);
+        starIndexes.add(randomIndex);
+    }
+
+    // Окрашиваем только выбранные ячейки
+    rectangles.forEach((rectangle, index) => {
+        if (starIndexes.has(index)) {
+            const back = rectangle.querySelector('.back');
+            
+            // Сначала устанавливаем градиент и создаем изображение
+            back.style.background = "linear-gradient(to bottom, #fbbf19, #fcb21c, #fb9317)";
+            const img = document.createElement('img');
+            img.src = '/static/miminesstar.png';
+            back.appendChild(img);
+            
+            // Затем добавляем класс для переворота
+            setTimeout(() => {
+                rectangle.classList.add('flipped');
+            }, 50);
+        }
+    });
+}
+
+document.querySelector('.bet-button').addEventListener('click', flipRectangles);
+document.querySelector('.restart-button').addEventListener('click', resetRectangles);
+</script>
+</body>
+</html>
