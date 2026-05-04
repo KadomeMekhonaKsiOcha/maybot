@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <link rel="stylesheet" href="style.css">
     <title>Tower Rush Signal</title>
 </head>
@@ -23,21 +23,20 @@
 
     <!-- Logo -->
     <div class="logo-wrap">
-        <div>
-            <div class="logo-text">Tower Rush</div>
-            <div class="logo-sub">by Galaxsys · Signal</div>
-        </div>
+        <div class="logo-text">Tower Rush</div>
+        <div class="logo-sub">by Galaxsys · Signal</div>
     </div>
 
+    <!-- Всё остальное — в flex-контейнере -->
     <div class="container">
 
-        <!-- Target floor / status -->
+        <!-- Статус -->
         <div id="status-wrap">
             <div id="status">— —</div>
             <div id="signal-accuracy">—</div>
         </div>
 
-        <!-- Tower: crane + floor tiles -->
+        <!-- Башня -->
         <div id="tower-outer">
             <div id="tower-inner">
                 <div id="crane-wrap">
@@ -47,17 +46,17 @@
             </div>
         </div>
 
-        <!-- Difficulty selector -->
+        <!-- Сложность -->
         <div class="diff-row">
             <button class="arr-btn" id="diff-prev">&#8249;</button>
             <span id="diff-label">MEDIUM</span>
             <button class="arr-btn" id="diff-next">&#8250;</button>
         </div>
 
-        <!-- Signal button -->
+        <!-- Кнопка сигнала -->
         <button id="flip">Получить сигнал</button>
 
-        <!-- Progress + countdown -->
+        <!-- Прогресс + таймер -->
         <div id="progress-bar-container">
             <div id="progress-bar"></div>
         </div>
@@ -65,7 +64,7 @@
 
     </div>
 
-    <!-- Back tab -->
+    <!-- Нижний таб -->
     <div class="tab">
         <button onclick="window.location.href='../index.html'">
             <img src="../mines/images/back.png" alt="Назад">

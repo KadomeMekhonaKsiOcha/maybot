@@ -154,10 +154,14 @@ document.addEventListener('DOMContentLoaded', () => {
     function resetFloors() {
         floorTiles.forEach((t, i) => {
             t.className = 'floor';
+            t.style.removeProperty('--tilt');
+            t.style.removeProperty('--offset');
             const num = t.querySelector('.floor-num');
             const mult = t.querySelector('.floor-mult');
-            if (num) num.textContent = (i + 1);
-            if (mult) { mult.textContent = ''; mult.style.opacity = '0'; }
+            const fire = t.querySelector('.floor-fire');
+            if (num)  num.textContent = (i + 1);
+            if (mult) mult.textContent = '';
+            if (fire) fire.remove();
         });
     }
 
@@ -226,27 +230,37 @@ document.addEventListener('DOMContentLoaded', () => {
                     const multEl = tile.querySelector('.floor-mult');
 
                     if (pos < cashoutPos) {
-                        // Safe floor
+                        // Safe — лёгкий наклон, башня ещё устойчива
+                        const tilt   = (Math.random() * 10 - 5).toFixed(1);
+                        const offset = (Math.random() * 14 - 7).toFixed(0);
+                        tile.style.setProperty('--tilt',   `${tilt}deg`);
+                        tile.style.setProperty('--offset', `${offset}px`);
                         tile.className = 'floor safe reveal';
-                        numEl.textContent  = `${t.floor}${globalIdx + 1}`;
                         multEl.textContent = fmtMult(mult);
-                        multEl.style.opacity = '1';
                     } else if (pos === cashoutPos) {
-                        // Cashout floor
+                        // Cashout — почти ровно, здесь выходим
+                        const tilt   = (Math.random() * 4 - 2).toFixed(1);
+                        const offset = (Math.random() * 6 - 3).toFixed(0);
+                        tile.style.setProperty('--tilt',   `${tilt}deg`);
+                        tile.style.setProperty('--offset', `${offset}px`);
                         tile.className = 'floor cashout reveal';
-                        numEl.textContent  = `${t.floor}${globalIdx + 1}`;
                         multEl.textContent = fmtMult(mult);
-                        multEl.style.opacity = '1';
 
                         statusEl.textContent = `${t.cashout} ${globalIdx + 1} — ${fmtMult(mult)}`;
-
                         craneImg.classList.add('excited');
                         setTimeout(() => craneImg.classList.remove('excited'), 1400);
                     } else {
-                        // Danger floor
+                        // Danger — башня рушится, сильный наклон
+                        const tilt   = (Math.random() * 32 - 16).toFixed(1);
+                        const offset = (Math.random() * 28 - 14).toFixed(0);
+                        tile.style.setProperty('--tilt',   `${tilt}deg`);
+                        tile.style.setProperty('--offset', `${offset}px`);
                         tile.className = 'floor danger reveal';
-                        numEl.textContent  = `${t.floor}${globalIdx + 1}`;
-                        if (multEl) multEl.textContent = '';
+                        // огонь внутри блока
+                        const fire = document.createElement('span');
+                        fire.className = 'floor-fire';
+                        fire.textContent = '🔥';
+                        tile.appendChild(fire);
                     }
                 }, delay);
             })(i);
