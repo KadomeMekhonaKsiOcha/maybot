@@ -177,7 +177,7 @@
             position: relative; z-index: 9;
             display: flex; align-items: center; justify-content: center;
             gap: 6px;
-            padding: 5px 0 0;
+            padding: 8px 0 2px;
             font-family: Arial, sans-serif;
         }
         .online-dot {
@@ -538,18 +538,6 @@
         </div>
     </div>
 
-    <!-- Online counter -->
-    <div class="online-bar">
-        <span class="online-dot"></span>
-        <span class="online-text"><span class="online-count-wrap"><b id="online-count">1 284</b></span> онлайн</span>
-    </div>
-
-    <!-- Search bar -->
-    <div class="search-bar" id="search-bar">
-        <input type="text" id="search-input" placeholder="Поиск игры..." oninput="applyFilters()">
-        <button class="search-clear-btn" onclick="clearSearch()">✕</button>
-    </div>
-
     <!-- Contact tab -->
     <div id="Contact" class="tabcontent">
         <div class="image-container">
@@ -588,6 +576,18 @@
 
     <!-- Games tab -->
     <div id="Games" class="tabcontent active">
+
+        <!-- Online counter -->
+        <div class="online-bar">
+            <span class="online-dot"></span>
+            <span class="online-text"><span class="online-count-wrap"><b id="online-count">1 284</b></span> онлайн</span>
+        </div>
+
+        <!-- Search bar -->
+        <div class="search-bar" id="search-bar">
+            <input type="text" id="search-input" placeholder="Поиск игры..." oninput="applyFilters()">
+            <button class="search-clear-btn" onclick="clearSearch()">✕</button>
+        </div>
 
         <!-- Filter pills -->
         <div class="filter-bar">
